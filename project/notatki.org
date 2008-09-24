@@ -1,0 +1,55 @@
+* Lista przeciwników
+  - normalne helikoptery lecące z lewej na prawą, z prawej na lewą, z góry, lub 
+    po ścieżkach. Wiele rodzajów.
+  - Naziemne wyrzutnie rakiet (naprowadzanych)
+  - "Połówki pomarańczy", które się otwierają i wystrzeliwują duże rakiety
+  - Czołgi jadące przed siebię
+  - Kaczucha
+  - Mina (taka leżąca)
+  - Naziemne wyrzutnie dużych (długich białych) rakiet - dziura w ziemi
+  - Wyrzutnia "trójnik". Wyrzuca trzy rakiety. Jedną 45 stopni w górę, drugą 
+    równolegle do ziemi, trzecią 45 w ziemię. Strzela seriami. Na raz wyrzuca 3 
+    rakiety w serii są 3 wyrzuty od razu (łącznie 9 rakiet na raz). 
+  - Czołgi na spadochronach (przy trafieniu w spadochron, spadochron pęka i 
+    czołg szybciej spada)
+  - Rakiety przelatujące z prawej na lewą
+  - Helikopter "statyczny". Przez pewien czas widać tylko jego dziub
+    przy prawej krawędzi. Strzela w kierunku helikoptera i jeepa
+    jednocześnie. Jest niezniszczalny.  Potem wylatuje normalnie i
+    już można go atakować.
+  - Czołg jadący w prawą stronę (trochę wolniej niż plansza).
+  - Helikoptery nadlatujące z góry i lecące w kształt litery U. Do ziemi i w 
+    górę. W późniejszych poziomach mogą strzelać
+  - Szybkie samoloty. Lecące po prostej, lekko opadając
+  - Chodzące roboty - strzelają naprowadzanymi rakietami
+  - Czołg pancerny wyjeżdża z lewej strony. Stoi przy lewej krawędzi. Otwiera 
+    klapę i wystrzeliwuje 5 rakiet jednocześnie. Każdą w innym kierunku. Po 
+    jakimś czasie się wycofuje
+  - Helikopterki lecąc tak jakby po wartości bezwzględnej z sinusa (przy 
+    ziemi). Wychodzi efekt odbijania się od ziemi.
+  - Toczące się miny. Wyglądają jak zwinięta nić. Jak je trafisz to dostają 
+    speed w przeciwnym kierunku (tak jakby to kopnąć) niż jest jeep. Miny są 
+    czasem z prawej czasem z lewej strony
+  - Carrier. Leci z lewej na prawą wyrzucając malutkie helikopterki (ma dużo 
+    życia). W jednym z poziomów leci u góry, w jednym na dole
+  - Świder. Taka puszka z kolcem. Na początku się przymierza jadąc powolutku w 
+    prawo. Jest niezniszczalny. Po chwili startuje z dużą prędkością w lewo.
+  - Słup. Można wybijać trafieniem (2 trafienia). Kawałki w prawo za planszę. 
+    Dół się niszczy gdy wszystkie kawałki z niego zlecą. Dół to podstawa 
+    wysokości ok 3 kawałków
+  - Odrzutowce (lecą szybko z prawej na lewą)
+  - Działko wystające z prawej krawędzi (poruszające się w górę i dół) i 
+    strzelające plazmą. Niezniszczalne. Po chwili wylatuje i można zniszczyć.
+  - Małe helikoptery. Raczej wolne. Strzelają na raz we wszystkich kierunkach
+  - Kule. Chyba nic nie robią, tylko są. Zawsze zajmują całą wyskość. Mają dużo 
+    życia.
+  - Czołg "łapka". Cofa się i atakuje, cofa i atakuje. Gdy widać tylko łapkę, 
+    to nie można go trafić.
+  - Na wyższych poziomach wyrzutnie szybciej strzelają i w większych seriach
+  - Niezniszczalne rakiety lecące szybko przez ekran z prawej na lewą
+  - Helikopter szybko przelatujący przy górnej krawędzi. Zrzuca całą masę 
+    pocisków w dół. Wszystkie wycelowane w gracza. 
+  - Czołgi jadące z prawej na lewą. Gdy dojadą do lewej krawędzi zaczynają 
+    jechać w prawo. Strzelają rakietami.
+
+  
