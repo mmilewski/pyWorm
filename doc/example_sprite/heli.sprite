@@ -1,0 +1,12 @@
+-- -*- haskell -*-
+FILE = "heli.png"
+
+ANIMATION = ""
+--       YOFF 0   -- 0 jest domyślnie, więc można pominąć
+      FRAME = 130, 90 -- szerokosc, wysokosc kafelka/klatki
+
+      COLS = 7        -- klatek kolumn
+
+      FRAMES = 7      -- klatek
+
+      DURATION = 100  -- czas trwania animacji
