@@ -53,3 +53,30 @@
     jechać w prawo. Strzelają rakietami.
 
   
+
+* Specyfikacja sprite'ów
+-- -*- haskell -*-
+-- -*- coding: utf-8 -*-
+
+plik z definicją sprite'a
+
+komentarz:
+    -- jednolinijkowy komentarz
+
+ciągi znaków:
+    'ciąg znaków'
+    "inny ciąg znaków"
+      
+liczby:
+    123
+    0123   (123 a nie 511 (dziesiętnie a nie ósemkowo))
+
+polecenia:
+    FILE = filename         -- grafika jest w pliku filename
+    STATE = nazwa stanu     -- nazwa stanu, który zaczynamy definiować, difinicja statnu kończy się wraz z definicją nowego lub końcem pliku.
+    FRAME = szer, wys       -- szerokość i wysokość jednej klatki
+    FRAMES = klatek         -- liczba klatek w animacji
+    YOFF = przesunięcie     -- przesunięcie animacji w pliku w pionie (domyślnie 0, więc nie trzeba podawać). Przesunięcie w poziomie jest zawsze równe 0
+    DURATION = czas_w_ms    -- czas trwania ANIMACJI w milisekundach (1000ms=1s)
+
+
