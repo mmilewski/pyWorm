@@ -51,9 +51,6 @@
     pocisków w dół. Wszystkie wycelowane w gracza. 
   - Czołgi jadące z prawej na lewą. Gdy dojadą do lewej krawędzi zaczynają 
     jechać w prawo. Strzelają rakietami.
-
-  
-
 * Specyfikacja sprite'ów
 -- -*- mode:haskell; coding: utf-8 -*-
 -- to jest przykladowy plik z definicją sprite'a --
@@ -85,4 +82,3 @@ ANIMATION = "yeah"
 
       YOFF = 512        -- klatki zaczynają się od 512 piksela od góry
                         -- przesunięcie w poziomie jest stałe,równe 0
-
