@@ -4,9 +4,9 @@
 
 FILE = "bang.png"   -- animacje znajdują się w pliku "bang.png"
 
-ANIMATION = "bang" -- domyślny stan
---       Y_OFFSET 0   -- 0 jest domyślnie, więc można pominąć
---       X_OFFSET 0   -- 0 jest domyślnie, więc można pominąć
+ANIMATION = "" -- domyślna animacja, zostanie załadowana automatycznie
+--       Y_OFFSET = 0   -- 0 jest domyślnie, więc można pominąć
+--       X_OFFSET = 0   -- 0 jest domyślnie, więc można pominąć
       FRAME = 128, 128  -- szzerokość i wysokość klatki
       FRAMES_COUNT = 7  -- 7 klatek w animacji
       COLS_COUNT = 4    -- klatki są w 4 kolumnach

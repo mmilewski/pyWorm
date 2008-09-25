@@ -2,8 +2,8 @@
 FILE = "heli.png"
 
 ANIMATION = ""
---       Y_OFFSET 0   -- 0 jest domyślnie, więc można pominąć
---       X_OFFSET 0   -- 0 jest domyślnie, więc można pominąć
+--       Y_OFFSET = 0   -- 0 jest domyślnie, więc można pominąć
+--       X_OFFSET = 0   -- 0 jest domyślnie, więc można pominąć
       FRAME = 130, 90 -- szerokosc, wysokosc kafelka/klatki
 
       COLS_COUNT = 7        -- klatek kolumn
