@@ -2,11 +2,12 @@
 FILE = "heli.png"
 
 ANIMATION = ""
---       YOFF 0   -- 0 jest domyślnie, więc można pominąć
+--       Y_OFFSET 0   -- 0 jest domyślnie, więc można pominąć
+--       X_OFFSET 0   -- 0 jest domyślnie, więc można pominąć
       FRAME = 130, 90 -- szerokosc, wysokosc kafelka/klatki
 
-      COLS = 7        -- klatek kolumn
+      COLS_COUNT = 7        -- klatek kolumn
 
-      FRAMES = 7      -- klatek
+      FRAMES_COUNT = 7      -- klatek
 
-      DURATION = 100  -- czas trwania animacji
+      DURATION = 100  -- czas trwania animacji (w ms)

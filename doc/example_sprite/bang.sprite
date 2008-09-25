@@ -5,10 +5,11 @@
 FILE = "bang.png"   -- animacje znajdują się w pliku "bang.png"
 
 ANIMATION = "bang" -- domyślny stan
---       YOFF 0   -- 0 jest domyślnie, więc można pominąć
+--       Y_OFFSET 0   -- 0 jest domyślnie, więc można pominąć
+--       X_OFFSET 0   -- 0 jest domyślnie, więc można pominąć
       FRAME = 128, 128  -- szzerokość i wysokość klatki
-      FRAMES = 7        -- 7 klatek w animacji
-      COLS = 4          -- klatki są w 4 kolumnach
+      FRAMES_COUNT = 7  -- 7 klatek w animacji
+      COLS_COUNT = 4    -- klatki są w 4 kolumnach
                         -- liczba rzędów jest wyliczalna
       DURATION = 1000   -- cała animacja trwa sekundkę
 
@@ -18,9 +19,9 @@ ANIMATION = "yeah"
 
       FRAME = 128, 128
 
-      FRAMES = 5
+      FRAMES_COUNT = 5
 
-      COLS = 4
+      COLS_COUNT = 4
 
-      YOFF = 512        -- klatki zaczynają się od 512 piksela od góry
-                        -- przesunięcie w poziomie jest stałe,równe 0
+      Y_OFFSET = 512    -- klatki zaczynają się od 512 piksela od góry
+                        -- przesunięcie w poziomie jest domyślnie 0
