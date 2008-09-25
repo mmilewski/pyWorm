@@ -23,5 +23,5 @@ ANIMATION = "yeah"
 
       COLS_COUNT = 4
 
-      Y_OFFSET = 512    -- klatki zaczynają się od 512 piksela od góry
+      Y_OFFSET = 256    -- klatki zaczynają się od 512 piksela od góry
                         -- przesunięcie w poziomie jest domyślnie 0
