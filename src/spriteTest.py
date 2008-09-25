@@ -120,7 +120,7 @@ class Sprite:
 
         if not self.__spriteLoaded:
             print "Error: nie ma żadnych animacji do wyświetlenia. Czy zostały wczytane?"
-            return
+            return False
 
         ''' FIXME poniższym prawdopodobnie powinna zajmować się już inna klasa. '''
         # 
