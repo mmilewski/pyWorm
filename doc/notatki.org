@@ -1,3 +1,4 @@
+# -*- org -*-
 * Lista przeciwników
   - normalne helikoptery lecące z lewej na prawą, z prawej na lewą, z góry, lub 
     po ścieżkach. Wiele rodzajów.
@@ -83,3 +84,13 @@ ANIMATION = "yeah"
 
       Y_OFFSET = 512    -- klatki zaczynają się od 512 piksela od góry
                         -- przesunięcie w poziomie jest stałe,równe 0
+* Podział pracy
+** Marcin
+   - Animacja sprite'ów, refactoring
+   - GameObjectFactory
+   - LevelLoader - prosty
+** Łukasz
+   - AIStrategy
+   - InputManager
+   - GameObject
+   - Kolizje
