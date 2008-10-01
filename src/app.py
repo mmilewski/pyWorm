@@ -19,6 +19,7 @@ class App(object):
         self.__world = GameWorld()
         fullscreen = False
         vsync = True
+        
         if fullscreen:
             self.win = window.Window( fullscreen=True, vsync=vsync )
         else:
@@ -60,7 +61,6 @@ class App(object):
 
     def add_objects(self):
         self.__add_scripted_object( 'bang', Triangle() )
-
 
     def main_loop(self):
         ''' Pętla główna gry. '''
