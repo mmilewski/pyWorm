@@ -15,7 +15,7 @@ class GameObjectFactory(object):
         print "GameObjectFactory:",
         if self.__objects.has_key(objectName):
             print "Tworzenie obiektu `%s`" % objectName
-            return self.__objects[objectName]
+            return self.__objects[objectName].clone()
         else:
             print "WARNING, obiektu `%s` nie znaleziono, nie utworzono." % objectName
             return None
@@ -28,8 +28,8 @@ class GameObjectFactory(object):
             print "WARNING, próba zarejestrowania pustego obiektu `%s`"%name
             return
         if self.__objects.has_key(name):
-            self.__objects[name] = object
             print "WARNING, ponowne rejestrowanie `%s`"%name
+            self.__objects[name] = object.clone()
         else:
-            self.__objects[name] = object
             print "zarejestrowano `%s`"%name
+            self.__objects[name] = object.clone()

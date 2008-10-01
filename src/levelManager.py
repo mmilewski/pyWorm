@@ -37,8 +37,8 @@ class LevelManager(object):
 
 
     def __name2object(self, objectName):
-        d = { 'heli': HeliGO.clone(),
-              'jeep': JeepGO.clone()    }
+        d = { 'heli': HeliGO(),
+              'jeep': JeepGO()    }
         if d.has_key(objectName): return d[objectName]
         else:
             print "Brak obiektu odpowiadającego nazwie `%s`" % objectName
