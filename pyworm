@@ -1,0 +1,6 @@
+#!/bin/sh
+
+PYTHON=python
+
+cd src;
+$PYTHON app.py;
