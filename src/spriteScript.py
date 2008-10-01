@@ -3,6 +3,7 @@
 
 from pyglet import resource, image
 import re
+import os.path
 
 
 class SpriteAnimation(object):
@@ -47,20 +48,25 @@ class SpriteScript(object):
         self.__filename = ''         # nazwa pliku z danymi sprite'a
         self.__animations = {}       # animacje sprite'a
         self.__imageFilename = ''    # nazwa pliku z obrazkami dla sprite'a
+        self.__resourceDir = ''      # katalog z zasobami
 
 #     framesCount = property( lambda self: self.__framesCount )
 #     colsCount = property( lambda self: self.__colsCount )
-    filename = property( lambda self: self.__filename )
-    imageFilename = property( lambda self: self.__imageFilename )
-    isLoaded = property( lambda self: self.__spriteLoaded )
 #     offsetxy = property( lambda self: self.__offsetXY )
 #     duration = property( lambda self: self.__duration )
 #     framewh = property( lambda self: self.__frameWH )
+    filename = property( lambda self: os.path.join(self.resourceDir,self.__filename) )
+    imageFilename = property( lambda self: os.path.join(self.resourceDir,self.__imageFilename) )
+    isLoaded = property( lambda self: self.__spriteLoaded )
+
+    def set_resource_dir(self,val): self.__resourceDir = val
+    resourceDir = property( lambda self: self.__resourceDir )
 
 
-    def load_from_file(self, filename):
+    def load_from_file(self, filename, resourceDir=''):
         ''' Ładuje animacje z pliku ze spritem. Zwraca status powodzenia.'''
         self.__filename = filename
+        self.__resourceDir = resourceDir
         self.__animations = {}
         self.__imageFilename = ''
         self.__spriteLoaded = False

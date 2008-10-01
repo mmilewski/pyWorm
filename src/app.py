@@ -42,7 +42,7 @@ class App(object):
         object.spriteName = spriteName
         # załaduj skrypt
         script = SpriteScript()
-        script.load_from_file( scriptFilename )
+        script.load_from_file( scriptFilename, resourceDir='../gfx' )
         # dodaj strategię na podstawie skryptu
         object.spriteStrategy = SpriteScriptStrategy( script )
 
