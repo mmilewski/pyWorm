@@ -12,7 +12,6 @@ from camera import Camera
 from spriteStrategy import SpriteScriptStrategy
 from spriteScript import SpriteScript
 
-
 class App(object):
 
     def __init__(self):
