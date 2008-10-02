@@ -26,7 +26,7 @@ class GameWorld(object):
     def add_object(self, gameobject):
         ''' Dodaje obiekt do świata. Sprawdza typ dodawanego obiektu. '''
         try: isinstance(gameobject, GameObject),
-        except TypeError, msg: print msg, "Obiekt nie jest typu GameObject."
+        except TypeError, msg: print msg, "Dodawany obiekt nie jest typu GameObject."
 
         self.__objects.append( gameobject )
         self.collisionManager.add_object( gameobject )
@@ -81,17 +81,13 @@ class GameWorld(object):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        
-        for obj in self.__objects:
-            sname = obj.spriteName
-            #
-            # FIXME
-            # pobranie animName i frameNum z jakiegos menadżera stanów
-            #
-            animName = ''
-            frameNum = obj.spriteStrategy.curFrameNum
 
+        for obj in self.__objects:
+            sname    = obj.spriteName
+            animName = obj.get_animation_name()
+            frameNum = obj.get_current_frame_num()
             frame = self.spriteManager.get_frame( sname, animName, frameNum )
+
             glPushMatrix()
             glEnable( frame.texture.target )
             glBindTexture( frame.texture.target, frame.texture.id )
@@ -100,4 +96,8 @@ class GameWorld(object):
 
 
     def check_collisions(self):
+        ''' Pobiera pary kolidujących obiektów i nakazuje obsługę któremuś z nich. '''
         collPairs = self.collisionManager.get_colliding_objects()
+        for a,b in collPairs:
+            if not a==b:
+                a.collide(b)

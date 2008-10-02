@@ -2,12 +2,21 @@
 # -*- coding: utf-8 -*-
 
 from spriteScript import SpriteScript, SpriteAnimation
+from math import floor
 
 
 class SpriteStrategy( object ):
 
     def __init__(self):
         pass
+
+
+    def get_animation_name(self): abstract
+    def get_frame_duration(self): abstract
+    def get_current_frame_num(self): abstract
+    def get_animation_duration(self): abstract
+
+    def set_animation(self, animName, frameDuration, startFrame): abstract
 
     def update(self, dt):
         abstract
@@ -16,27 +25,47 @@ class SpriteStrategy( object ):
 class SpriteScriptStrategy( SpriteStrategy ):
 
     def __init__(self, spriteScript):
+
+        # zapamiętaj dane ze skryptu
         self.__spriteScript = spriteScript
 
-        # jako animację pobierz domyślną
-        self.__curAnim = self.__spriteScript.get_animation( '' ) 
+        # nazwa aktualnie przetwarzanej animacji
+        self.__animationName = ''  # domyślna
 
-        # numer aktualnie wyświetlanej klatki
-        self.__curFrameNum = 0
+        # ustaw aktualną animację na domyślną
+        self.__curAnimation = self.__spriteScript.get_animation(self.__animationName)
 
-        # czas od ostatniej zmiany klatki
-        self.__lastChangeTime = 0.0
+        # czas trwania animacji (o ile klatki animacja zaczęła się od 0. klatki)
+        self.__animationDuration = 0.0
 
-    def set_animation(self, val): self.__curAnim = self.__spriteScript.get_animation(val)
-    anim = property( lambda self: self.__curAnim, set_animation )
+    def get_animation_name(self): return self.__animationName
+    def get_current_frame_num(self):
+        return floor(self.get_animation_duration()/self.__curAnimation.duration)
 
-    curFrameNum = property( lambda self:self.__curFrameNum )
+    #
+    # FIXME klasy pochodne nie muszą wcale dostarczać propercji
+    #
+    animationName = property( get_animation_name )
+    frameDuration = property( get_frame_duration )
+    currentFrameNum = property( get_current_frame_num )
+    animationDuration = property( get_animation_duration )
+
+
+    def set_animation(self, animName, startFrame=0):
+        animation = self.__spriteScript.get_animation( animName )
+        if not animation:  # jeżeli nie ma animacji, to załaduj domyślną
+            self.__animationName = ''
+            animation = self.__spriteScript.get_animation( '' )
+            if not animation: # jeżeli nie ma domyślnej, to spanikuj
+                print 'PANIC: Brak domyślnej animacji. Próbowano ustawić `%s`'%animName
+        else:
+            self.__animationName = animName
+        self.__curAnimation = animation
+
+        frameDuration = self.__curAnimation.duration
+        self.__animationDuration = 0.0 + frameDuration * startFrame
+        self.__curFrameNum = startFrame
 
 
     def update(self, dt):
-        self.__lastChangeTime += dt
-        if self.__lastChangeTime > self.anim.duration:
-            self.__lastChangeTime = 0.0
-            self.__curFrameNum += 1
-            self.__curFrameNum %= self.anim.framesCount
-
+        self.__animationDuration += dt

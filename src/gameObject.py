@@ -22,7 +22,6 @@ class GameObject(object):
         # (SpriteStrategy)
         self._spriteStrategy = None
 
-
     def set_aabb(self,val): self._aabb = val
     aabb = property(lambda self:self._aabb, set_aabb )
 
@@ -35,6 +34,20 @@ class GameObject(object):
     def set_sprite_strategy(self,val): self._spriteStrategy = val
     spriteStrategy = property( lambda self:self._spriteStrategy, set_sprite_strategy)
 
+    def get_animation_name():
+        if self.spriteStrategy:
+            return self.spriteStrategy.get_animation_name()
+        else:
+            print "WARNING: GameObject nie ma spriteStrategy"
+            return None
+
+    def get_current_frame_num():
+        if self.spriteStrategy:
+            return self.spriteStrategy.get_current_frame_num()
+        else:
+            print "WARNING: GameObject nie ma spriteStrategy"
+            return None
+
 
     def clone():
         abstract
@@ -42,6 +55,11 @@ class GameObject(object):
 
     def update(self, dt):
         abstract
+
+
+    def collide(self, object):
+        ''' Metoda obsługuje kolizję z object. '''
+        pass  # domyślnie brak obsługi
 
 
 
