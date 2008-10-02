@@ -1,0 +1,11 @@
+-- -*- mode:haskell; coding: utf-8 -*-
+
+FILE = "spritedzialkosamochod.png"
+
+ANIMATION = ""
+--       Y_OFFSET = 0
+--       X_OFFSET = 0
+      FRAME = 200, 80
+      FRAMES_COUNT = 45
+      COLS_COUNT = 6
+      DURATION = 10

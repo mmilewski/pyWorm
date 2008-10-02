@@ -1,0 +1,47 @@
+-- -*- mode:haskell; coding: utf-8 -*-
+
+
+FILE = "helisprite.png"   
+
+ANIMATION = ""
+--       Y_OFFSET = 0
+--       X_OFFSET = 0
+      FRAME = 130, 90
+      FRAMES_COUNT = 7
+      COLS_COUNT = 7
+      DURATION = 100
+
+ANIMATION = "przod"
+         Y_OFFSET = 90
+--       X_OFFSET = 0
+      FRAME = 130, 90
+      FRAMES_COUNT = 3
+      COLS_COUNT = 3
+      DURATION = 50
+
+ANIMATION = "leciprzod"
+         Y_OFFSET = 180
+--       X_OFFSET = 0
+      FRAME = 130, 90
+      FRAMES_COUNT = 7
+      COLS_COUNT = 7
+      DURATION = 100
+
+ANIMATION = "tyl"
+         Y_OFFSET = 270
+--       X_OFFSET = 0
+      FRAME = 130,  90
+      FRAMES_COUNT = 3
+      COLS_COUNT = 3
+      DURATION = 50
+
+ANIMATION = "lecityl"
+         Y_OFFSET = 360
+--       X_OFFSET = 0
+      FRAME = 130, 90
+      FRAMES_COUNT = 7
+      COLS_COUNT = 7 
+      DURATION = 100
+
+
+
