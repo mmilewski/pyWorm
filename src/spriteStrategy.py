@@ -16,7 +16,7 @@ class SpriteStrategy( object ):
     def get_current_frame_num(self): abstract
     def get_animation_duration(self): abstract
 
-    def set_animation(self, animName, frameDuration, startFrame): abstract
+    def set_animation(self, animName, startFrame): abstract
 
     def update(self, dt):
         abstract
