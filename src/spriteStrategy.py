@@ -5,27 +5,33 @@ from spriteScript import SpriteScript, SpriteAnimation
 from math import floor
 
 
-class SpriteStrategy( object ):
+# class SpriteStrategy( object ):
 
-    def __init__(self):
-        pass
+#     def __init__(self):
+#         pass
 
 
-    def get_animation_name(self): abstract
-    def get_frame_duration(self): abstract
-    def get_current_frame_num(self): abstract
-    def get_animation_duration(self): abstract
+#     def get_animation_name(self): abstract
+#     def get_frame_duration(self): abstract
+#     def get_current_frame_num(self): abstract
+#     def get_animation_duration(self): abstract
 
-    def set_animation(self, animName, startFrame): abstract
+#     def set_animation(self, animName, startFrame): abstract
 
-    def update(self, dt):
-        abstract
+#     def update(self, dt):
+#         abstract
 
 
 class SpriteScriptStrategy( SpriteStrategy ):
 
     def __init__(self, spriteScript):
 
+        #
+        # FIXME
+        # spriteScript zawiera nadmiarowe info (cały załadowany skrypt).
+        # Powinien raczej zostać zastąpiony przez coś mniejszego.
+        #
+        
         # zapamiętaj dane ze skryptu
         self.__spriteScript = spriteScript
 

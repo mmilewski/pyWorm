@@ -2,21 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from pyglet import image
-from spriteScript import SpriteScript
-
-class SpriteFrame:
-
-    def __init__(self, texture, frameRect ):
-        ''' Tworzy klatkę.
-        texture - tekstura, na której jest klatka do narysowania.
-        frameRect - krotka (xLewy, yDół, xPrawy, yGóra) opisując, który fragment
-        tekstury należy narysować (gdzie znajduje się klatka).'''
-        self.__texture = texture
-        self.__frameRect = frameRect
-
-    rect = property( lambda self: self.__frameRect )
-    texture = property( lambda self: self.__texture )
-
+# from spriteScript import SpriteScript
+from spriteInfo import SpriteInfo
+from spriteAnimationFrame import SpriteAniamtionFrame
 
 
 class SpriteManager:
@@ -29,13 +17,6 @@ class SpriteManager:
         self.__spriteExtension = '.sprite'
 
     spriteExt = property( lambda self: self.__spriteExtension )
-
-
-#     def load_sprite_from_file(self, filename):
-#         ''' Ładuje sprite'a z pliku skryptowego. '''
-#         s = SpriteScript()
-#         s.load_from_file(filename)
-#         self.add_script( ..... )
 
 
     def add_script(self, scriptName, spriteScript):
@@ -56,9 +37,24 @@ class SpriteManager:
         frameNum - numer klatki animacji do narysowania. '''
 
         #
-        # ADDME
+        # FIXME
         # wyliczenie współrzednych klatki do narysowania
         #
+
         imageFilename = (self.__sprites[spriteName]).imageFilename
         tex = image.load(imageFilename).get_texture()
-        return SpriteFrame( tex, (0,0,1,1) )
+        return SpriteAnimationFrame( tex, (0,0,1,1) )
+
+
+    def check_sprite_collision(self, sprite1, sprite2, delta):
+        ''' Sprawdza czy jeżeli na sprite1 nałożymy sprite2 w pozycji delta
+        (jest to przesunięcie lewego dolnego rogu sprite2 względem lewego dolnego
+        rogu sprite1), to czy istnieją dwa pikesele które nachodzą na siebie
+        (czyli czy przecięcie miejsc gdzie oba nie mają kanału alfa 0 jest niepuste). '''
+
+        #
+        # FIXME
+        # sprawdzanie per-pixel
+        #
+
+        return True

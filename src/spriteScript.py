@@ -1,34 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from pyglet import resource, image
 import re
 import os.path
 
-
-class SpriteAnimation(object):
-    def __init__(self, animDict, imageFilename):
-        self.__imageFilename = imageFilename
-
-        try:
-            self.__texture = image.load( imageFilename ).get_texture() if imageFilename else None
-        except :
-            print "Error: ładowanie tekstury z pliku nie powiodło się (%s)." % imageFilename
-        try:
-            anim = animDict
-            self.__yoff = (anim['yoff'] if anim.has_key('yoff') else 0)  # default
-            self.__xoff = (anim['xoff'] if anim.has_key('xoff') else 0)  # default
-            self.__frameCount = anim['frames_count']
-            self.__duration = anim['duration'] / self.__frameCount / 1000.0
-            self.__wid, self.__hei = anim['frame']
-            self.__colCount = anim['cols']
-        except KeyError, arg:
-            print 'Error: brakujący klucz (',arg,'). Dane źle wczytane?'
-
-    imageFilename = property( lambda self: self.__imageFilename )
-    texture = property( lambda self: self.__texture )
-    duration = property( lambda self: self.__duration )
-    framesCount = property( lambda self: self.__frameCount )
 
 
 class SpriteScript(object):
@@ -158,40 +133,6 @@ class SpriteScript(object):
         else:
             print 'Error: nie ma takiej animacji (',animName,')'               
 
-
-#     def set_animation(self, animName, reload=False):
-#         ''' Ustawia dane żądanej animacji.
-#         reload - Wymusza rozpoczęcie animacji od 0. klatki.
-#         Zwraca False jeżeli ustawienie animacji się nie powiodło. '''
-
-#         self.assertme()
-
-#         if not self.isLoaded:
-#             print "Error: nie ma żadnych animacji do wyświetlenia. Czy zostały wczytane?"
-#             return False
-
-#         anim = self.__animations[animName] if self.__animations.has_key(animName) else {}
-#         if anim:
-#             imgFilename = self.imageFilename
-#             try:
-#                 self.tex = image.load( imgFilename ).get_texture() if imgFilename else None
-#             except:
-#                 print "Error: ładowanie tekstury z pliku nie powiodło się (%s)" % imgFilename
-#                 return False
-#             try:
-#                 self.yoff = (anim['yoff'] if anim.has_key('yoff') else 0)  # default
-#                 self.xoff = (anim['xoff'] if anim.has_key('xoff') else 0)  # default
-#                 self.frameNum = anim['frames_count']
-#                 self.duration = anim['duration'] / self.frameNum / 1000.0
-#                 self.wid, self.hei = anim['frame']
-#                 self.colNum = anim['cols']
-#             except KeyError,arg:
-#                 print 'Error: brakujący klucz (',arg,'). Dane źle wczytane?'
-#                 return False
-#         else:
-#             print 'Error: nie ma takiej animacji (',animName,')'
-#             return False
-#         return True
 
     def assertme(self):
         ''' Jakies self-testy spójności. '''
