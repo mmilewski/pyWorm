@@ -4,8 +4,9 @@
 from pyglet import image
 # from spriteScript import SpriteScript
 from spriteInfo import SpriteInfo
-from spriteAnimationFrame import SpriteAniamtionFrame
+from spriteAnimationFrame import SpriteAnimationFrame
 
+from pyglet.gl import *  # glIsTexture
 
 class SpriteManager:
 
@@ -36,14 +37,40 @@ class SpriteManager:
         animationName - nazwa znimacji w sprite'cie do narysowania
         frameNum - numer klatki animacji do narysowania. '''
 
+#         print "Debug: get_frame(`%s`,`%s`,%d)"%(spriteName, animationName, frameNum)
+
         #
         # FIXME
         # wyliczenie współrzednych klatki do narysowania
         #
 
         imageFilename = (self.__sprites[spriteName]).imageFilename
-        tex = image.load(imageFilename).get_texture()
-        return SpriteAnimationFrame( tex, (0,0,1,1) )
+        img  = image.load(imageFilename)
+        tex = img.get_texture()
+        texId = tex.id
+#         print "Debug: get_frame ładowanie `%s`"%imageFilename
+#         print "Debug: get_frame",img,tex,texId,texId.__class__,tex.target
+
+        if not glIsTexture(texId):
+            print "PANIC: nie stworzono tekstury. Problem z ładowaniem obrazka?"
+
+#         #
+#         # FIXME
+#         # dlaczego tutaj działa a w drawWorld nie??????
+#         #
+#         glEnable( GL_TEXTURE_2D )
+#         glBindTexture( GL_TEXTURE_2D, texId )
+#         left,bottom,right,top = 0,0,1,1
+#         tc = ( (left,bottom), (right,bottom), (right,top), (left,top) )
+#         left,bottom,right,top = .2,.2,.7,.7
+#         vs = ( (left,bottom), (right,bottom), (right, top), (left, top) )
+#         glBegin( GL_QUADS )
+#         for t,v in zip(tc,vs):
+#             glTexCoord2f( *t )
+#             glVertex2f( *v )
+#         glEnd()
+
+        return SpriteAnimationFrame( texId, (0,0,1,1) )
 
 
     def check_sprite_collision(self, sprite1, sprite2, delta):

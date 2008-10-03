@@ -4,7 +4,7 @@
 import re
 import os.path
 
-
+from spriteAnimation import SpriteAnimation
 
 class SpriteScript(object):
     ''' Opakowanie dla wartości wczytanych z pliku skryptowego. '''

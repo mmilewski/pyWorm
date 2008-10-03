@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from spriteScript import SpriteScript, SpriteAnimation
+from spriteScript import SpriteScript
+from spriteAnimation import SpriteAnimation
 from math import floor
 
 
@@ -22,7 +23,8 @@ from math import floor
 #         abstract
 
 
-class SpriteScriptStrategy( SpriteStrategy ):
+# class SpriteScriptStrategy( SpriteStrategy ):
+class SpriteScriptStrategy( object ):
 
     def __init__(self, spriteScript):
 
@@ -44,6 +46,7 @@ class SpriteScriptStrategy( SpriteStrategy ):
         # czas trwania animacji (o ile klatki animacja zaczęła się od 0. klatki)
         self.__animationDuration = 0.0
 
+    def get_animation_duration(self): return self.__animationDuration
     def get_animation_name(self): return self.__animationName
     def get_current_frame_num(self):
         return floor(self.get_animation_duration()/self.__curAnimation.duration)
@@ -52,7 +55,7 @@ class SpriteScriptStrategy( SpriteStrategy ):
     # FIXME klasy pochodne nie muszą wcale dostarczać propercji
     #
     animationName = property( get_animation_name )
-    frameDuration = property( get_frame_duration )
+#     frameDuration = property( get_frame_duration )
     currentFrameNum = property( get_current_frame_num )
     animationDuration = property( get_animation_duration )
 

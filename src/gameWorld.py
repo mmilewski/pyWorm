@@ -87,12 +87,36 @@ class GameWorld(object):
             animName = obj.get_animation_name()
             frameNum = obj.get_current_frame_num()
             frame = self.spriteManager.get_frame( sname, animName, frameNum )
-
+            
             glPushMatrix()
-            glEnable( frame.texture.target )
-            glBindTexture( frame.texture.target, frame.texture.id )
+
+#             # -- cut here --
+#             texId = frame.textureId
+#             glEnable( GL_TEXTURE_2D )
+#             glBindTexture( GL_TEXTURE_2D, texId )
+#             left,bottom,right,top = 0,0,1,1
+#             tc = ( (left,bottom), (right,bottom), (right,top), (left,top) )
+#             left,bottom,right,top = .2,.2,.7,.7
+#             vs = ( (left,bottom), (right,bottom), (right, top), (left, top) )
+#             glBegin( GL_QUADS )
+#             for t,v in zip(tc,vs):
+#                 glTexCoord2f( *t )
+#                 glVertex2f( *v )
+#             glEnd()
+#             # -- cut here --
+
+            texId = frame.textureId
+#             print "Debug: draw", texId, texId.__class__
+            if glIsTexture( texId ):
+                glEnable( GL_TEXTURE_2D )
+                glBindTexture( GL_TEXTURE_2D, texId )
+            else:
+                print "Error: rysując `%s` okazało się, że texId nie wskazuje na teskturę"%sname
             self.__draw_rect( frame.rect, (0, 0, .5, .5), (0,0,0) )
+
             glPopMatrix()
+
+#         print "-"*50
 
 
     def check_collisions(self):

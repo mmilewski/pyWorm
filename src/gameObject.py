@@ -29,19 +29,19 @@ class GameObject(object):
     spriteName = property(lambda self: self._spriteName, set_sprite_name)
 
     def set_ai_strategy(self,val): self._aiStrategy = val
-    aiStrategy = property( lambda self:self.__aiStrategy, set_ai_strategy)
+    aiStrategy = property( lambda self:self._aiStrategy, set_ai_strategy)
 
     def set_sprite_strategy(self,val): self._spriteStrategy = val
     spriteStrategy = property( lambda self:self._spriteStrategy, set_sprite_strategy)
 
-    def get_animation_name():
+    def get_animation_name(self):
         if self.spriteStrategy:
             return self.spriteStrategy.get_animation_name()
         else:
             print "WARNING: GameObject nie ma spriteStrategy"
             return None
 
-    def get_current_frame_num():
+    def get_current_frame_num(self):
         if self.spriteStrategy:
             return self.spriteStrategy.get_current_frame_num()
         else:
@@ -49,7 +49,7 @@ class GameObject(object):
             return None
 
 
-    def clone():
+    def clone(self):
         abstract
 
 

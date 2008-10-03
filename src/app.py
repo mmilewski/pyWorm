@@ -5,7 +5,7 @@ from pyglet import clock, font, image, window
 from pyglet.gl import *
 
 from collisionManager import CollisionManager
-from spriteManager import SpriteManager, SpriteFrame
+from spriteManager import SpriteManager
 from gameObject import Triangle
 from gameWorld import GameWorld
 from camera import Camera
