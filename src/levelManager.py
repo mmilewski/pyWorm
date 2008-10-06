@@ -1,45 +1,29 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from goHeli import HeliGO
-from goJeep import JeepGO
-
-
 class LevelManager(object):
+    ''' Zadaniem zarządcy poziomu jest załadowanie poziomu, a
+    następnie dorzucanie go gameWorld obiektów w odpowiednim
+    czasie. Między innymi powinien też tworzyć tło. Nie powinien
+    zarządzać instancjami gracza, gdyż tym zajmuje się gameWorld '''
 
-    def __init__(self):
-        pass
-
+    def __init__(self, objectFactory):
+        ''' objectFactory: Fabryka wykorzystywana do tworzenia obiektów (głównie przeciwników) '''
+        self.__object_factory = objectFactory
 
     def load_level(self, levelName):
+        ''' zmienia poziom na `levelName`. `levelName + 'lvl'` musi być nazwą poziomu występującą w `levels/`  '''
         print 'Ładowanie poziomu `%s`' % levelName
-        name = str(levelName)
-        list = ['heli','jeep']
-        if name=='1':
-            list.extern( ['ground_cannon'] )
-        elif name=='krowi poziom':
-            print "GL & HF"
-        else:
-            print "Tworzenie poziomu `%s` NIE powiodło się. Nieznana nazwa." % levelName
-            return
-        self.__load_game_objects( list )
 
 
-    def __load_game_objects(self, objectsNameList):
-        ''' Tworzy obiekty na podstawie ich nazw.
-        Zwraca fabrykę zdolną tworzyć wskazane w objectsNameList obiekty. '''
-        fatory = GameObjectFactory()
-        for objName in objectsNameList:
-            obj = self.__name2object(objName)
-            if obj:
-                factor.register_game_object()
-        return factory
-
-
-    def __name2object(self, objectName):
-        d = { 'heli': HeliGO(),
-              'jeep': JeepGO()    }
-        if d.has_key(objectName): return d[objectName]
-        else:
-            print "Brak obiektu odpowiadającego nazwie `%s`" % objectName
-            return None
+        #
+        # Tu trzeba dodać załadowanie pliku levelName (skryptu)
+        # następnie w update będzie wywoływane dodawanie przeciwników
+        # do planszy, lub przejście do następnego poziomu
+        #
+        # Trzeba dodać interfejs typu "level_finishing,
+        # level_finished, level_starting, level_started", aby
+        # gameWorld wiedział kiedy robić przejścia
+        #
+        # Musi też być metoda next_level, która przechodzi do następnego poziomu
+        # 

@@ -1,80 +1,43 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from spriteScript import SpriteScript
-from spriteAnimation import SpriteAnimation
+
 from math import floor
 
 
-# class SpriteStrategy( object ):
-
-#     def __init__(self):
-#         pass
-
-
-#     def get_animation_name(self): abstract
-#     def get_frame_duration(self): abstract
-#     def get_current_frame_num(self): abstract
-#     def get_animation_duration(self): abstract
-
-#     def set_animation(self, animName, startFrame): abstract
-
-#     def update(self, dt):
-#         abstract
-
-
-# class SpriteScriptStrategy( SpriteStrategy ):
 class SpriteScriptStrategy( object ):
+    ''' Sterowanie logiką sprite'a (zmiany stanu animacji - klatek) '''
 
     def __init__(self, spriteScript):
+        self.__spriteScript = spriteScript        # zapamiętaj dane ze skryptu
+        self.__animationName = 'default'          # nazwa aktualnie przetwarzanej animacji
+        self.__animationDuration = 0.0            # czas trwania animacji
 
-        #
-        # FIXME
-        # spriteScript zawiera nadmiarowe info (cały załadowany skrypt).
-        # Powinien raczej zostać zastąpiony przez coś mniejszego.
-        #
-        
-        # zapamiętaj dane ze skryptu
-        self.__spriteScript = spriteScript
 
-        # nazwa aktualnie przetwarzanej animacji
-        self.__animationName = ''  # domyślna
+    def get_animation_name(self):
+        return self.__animationName
 
-        # ustaw aktualną animację na domyślną
-        self.__curAnimation = self.__spriteScript.get_animation(self.__animationName)
+    
+    def get_current_frame_num(self):
+        animation = self.__spriteScript[ self.__animationName ]
+        val = int(floor((self.__animationDuration / (animation.duration / 100.0)) * animation.frames_count))
+        return val
 
-        # czas trwania animacji (o ile klatki animacja zaczęła się od 0. klatki)
+    
+    def set_animation(self, animName):
+        self.__animationName = animName
+        self.__curFrameNum   = 0
         self.__animationDuration = 0.0
 
-    def get_animation_duration(self): return self.__animationDuration
-    def get_animation_name(self): return self.__animationName
-    def get_current_frame_num(self):
-        return floor(self.get_animation_duration()/self.__curAnimation.duration)
-
-    #
-    # FIXME klasy pochodne nie muszą wcale dostarczać propercji
-    #
-    animationName = property( get_animation_name )
-#     frameDuration = property( get_frame_duration )
-    currentFrameNum = property( get_current_frame_num )
-    animationDuration = property( get_animation_duration )
-
-
-    def set_animation(self, animName, startFrame=0):
-        animation = self.__spriteScript.get_animation( animName )
-        if not animation:  # jeżeli nie ma animacji, to załaduj domyślną
-            self.__animationName = ''
-            animation = self.__spriteScript.get_animation( '' )
-            if not animation: # jeżeli nie ma domyślnej, to spanikuj
-                print 'PANIC: Brak domyślnej animacji. Próbowano ustawić `%s`'%animName
-        else:
-            self.__animationName = animName
-        self.__curAnimation = animation
-
-        frameDuration = self.__curAnimation.duration
-        self.__animationDuration = 0.0 + frameDuration * startFrame
-        self.__curFrameNum = startFrame
-
-
+        
     def update(self, dt):
         self.__animationDuration += dt
+
+        animation = self.__spriteScript[ self.__animationName ]
+        animationFinished = False
+        while self.__animationDuration >= animation.duration / 100.0:
+            self.__animationDuration -= animation.duration / 100.0
+            animationFinished = True
+
+        if animationFinished:
+            pass # FIXME: powiadomienie aiStrategy o zakończeniu animacji self.__animationName

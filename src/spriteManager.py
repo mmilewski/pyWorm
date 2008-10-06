@@ -2,75 +2,87 @@
 # -*- coding: utf-8 -*-
 
 from pyglet import image
-# from spriteScript import SpriteScript
-from spriteInfo import SpriteInfo
-from spriteAnimationFrame import SpriteAnimationFrame
 
-from pyglet.gl import *  # glIsTexture
+from spriteScriptParser import SpriteAnimationInfo
 
+class SpriteAnimationFrame:
+    ''' Informacje o pojedynczej klatce animacji
+    sprite'a. Wykorzystywane jako wartość zwracana
+    GameObject::get_frame '''
+
+    def __init__(self, textureId, drawRect, frameWidth, frameHeight ):
+        ''' Tworzy klatkę animacji sprite'a.
+        textureId - tekstura, na której jest klatka do narysowania.
+        drawRect - krotka (xLewy, yDół, xPrawy, yGóra) opisując, który fragment
+        tekstury należy narysować (gdzie znajduje się klatka).'''
+        self.textureId   = textureId
+        self.rect        = drawRect
+        self.width       = frameWidth
+        self.height      = frameHeight
+
+        
 class SpriteManager:
-
+    ''' Zarządza sprite'ami od strony grafiki. Logiką zarządzają same
+    obiekty przez SpriteScriptStrategy, które jest ładowane przez
+    SpriteScriptParser. Zadanime SpriteManager'a jest jedynie
+    przechowywać informacje o teksurach sprite'a i udostępniać na
+    żądanie konkretne klatki (w tym celu przechowuje część informacji
+    ze skryptu sprite'a) '''
+    
     def __init__(self):
-        # słownik ze sprite'ami (nazwaSprite'a, script)
-        self.__sprites = {}
-
-        # rozszerzenie dla plików z definicją sprite'a
-        self.__spriteExtension = '.sprite'
-
-    spriteExt = property( lambda self: self.__spriteExtension )
-
-
-    def add_script(self, scriptName, spriteScript):
+        self.__sprites = {}                 # słownik par (textureId, słownik animacji - spriteScripts, textureWidth, textureHeight )
+        self.__textures = []                # pamiętane, aby GC nie namieszał
+        
+    def load_sprite(self, spriteName, spriteScript):
         ''' Dodaje skrypt do menadżera. '''
-        # wyluskaj samą nazwę (obetnij rozszerzenie, jeżeli istnieje)
-        bareName = scriptName
-        if scriptName.endswith(self.spriteExt):
-            bareName = scriptName[ :len(scriptName) ]
+        (textureId, img) = self.__sprite_name_to_texture(spriteName)
+        self.__sprites[ spriteName ] = (textureId, spriteScript, float(img.width), float(img.height))
 
-        print 'DEBUG: SpriteManager: Dodaję skrypt `%s` jako `%s`.' % (scriptName,bareName)
-        self.__sprites[bareName] = spriteScript
+        
+    def __sprite_name_to_texture(self, spriteName):
+        ''' pobiera nazwę sprite'a i ładuje odpowiednią teksturę z
+        dysku. Zwraca teksturę i odpowiedni obrazek '''
+        spriteImagePath = "../gfx/" + spriteName + "/image.png"
+        
+        img       = image.load(spriteImagePath)
+        texture   = img.get_texture()
+        textureId = texture.id
 
+        self.__textures.append(texture)
+        
+        return (textureId, img)
 
+        
     def get_frame( self, spriteName, animationName, frameNum ):
-        ''' Zwraca klatkę do narysowania.
-        spriteName - nazwa sprite z animacją do narysowania
-        animationName - nazwa znimacji w sprite'cie do narysowania
-        frameNum - numer klatki animacji do narysowania. '''
+        ''' Zwraca klatkę do narysowania - obiekt typu SpriteAnimationFrame '''
 
-#         print "Debug: get_frame(`%s`,`%s`,%d)"%(spriteName, animationName, frameNum)
+        animation = self.__sprites[ spriteName ][ 1 ][ animationName ]
+        
+        texWidth  = self.__sprites[ spriteName ][ 2 ]
+        texHeight = self.__sprites[ spriteName ][ 3 ]
 
-        #
-        # FIXME
-        # wyliczenie współrzednych klatki do narysowania
-        #
+        # oblicz współrzędne lewego dolnego rogu
+        texLeft   = animation.x_offset + frameNum * animation.frame_width # pozycja, jeżeli pominiemy możliwość wielu wierszy na animację
+        texBottom = animation.y_offset + (texLeft / (animation.cols_count * animation.frame_width)) * animation.frame_height
+        texLeft  %= animation.cols_count * animation.frame_width
 
-        imageFilename = (self.__sprites[spriteName]).imageFilename
-        img  = image.load(imageFilename)
-        tex = img.get_texture()
-        texId = tex.id
-#         print "Debug: get_frame ładowanie `%s`"%imageFilename
-#         print "Debug: get_frame",img,tex,texId,texId.__class__,tex.target
+        # oblicz współrzędne prawego górnego rogu
+        texRight  = texLeft + animation.frame_width
+        texTop    = texBottom - animation.frame_height
 
-        if not glIsTexture(texId):
-            print "PANIC: nie stworzono tekstury. Problem z ładowaniem obrazka?"
+        # normalizacja współrzędnych (przejście z width i height do 0..1)
+        texLeft   /= texWidth
+        texRight  /= texWidth
+        texTop    /= texHeight
+        texBottom /= texHeight
 
-#         #
-#         # FIXME
-#         # dlaczego tutaj działa a w drawWorld nie??????
-#         #
-#         glEnable( GL_TEXTURE_2D )
-#         glBindTexture( GL_TEXTURE_2D, texId )
-#         left,bottom,right,top = 0,0,1,1
-#         tc = ( (left,bottom), (right,bottom), (right,top), (left,top) )
-#         left,bottom,right,top = .2,.2,.7,.7
-#         vs = ( (left,bottom), (right,bottom), (right, top), (left, top) )
-#         glBegin( GL_QUADS )
-#         for t,v in zip(tc,vs):
-#             glTexCoord2f( *t )
-#             glVertex2f( *v )
-#         glEnd()
+        # obliczanie id tekstury
+        textureId = self.__sprites[ spriteName ][ 0 ]
 
-        return SpriteAnimationFrame( texId, (0,0,1,1) )
+        return SpriteAnimationFrame( textureId,
+                                     (texLeft, texBottom, texRight, texTop),
+                                     animation.frame_width,
+                                     animation.frame_height )
 
 
     def check_sprite_collision(self, sprite1, sprite2, delta):
@@ -78,10 +90,4 @@ class SpriteManager:
         (jest to przesunięcie lewego dolnego rogu sprite2 względem lewego dolnego
         rogu sprite1), to czy istnieją dwa pikesele które nachodzą na siebie
         (czyli czy przecięcie miejsc gdzie oba nie mają kanału alfa 0 jest niepuste). '''
-
-        #
-        # FIXME
-        # sprawdzanie per-pixel
-        #
-
         return True

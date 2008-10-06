@@ -98,8 +98,8 @@ class ConcreteInputObserver(InputObserver):
 # Utworzenie InputManagera i włączenie go do pygleta            
 manager = InputManager()
 window = Window()
-window.on_key_press = lambda symbol, modifiers: manager.key_pressed(symbol, modifiers)
-window.on_key_release = lambda symbol, modifiers: manager.key_released(symbol, modifiers)
+window.on_key_press = manager.key_pressed
+window.on_key_release = manager.key_released
 
 # Tworzymy 3 obiekty obserwujące
 ops1 = ConcreteInputObserver('ops1')

@@ -2,21 +2,23 @@
 # -*- coding: utf-8 -*-
 
 from pyglet.gl import *
-# class Hud(object):
 
-#     def __init__(self, winSize):
-#         self.__winSize = winSize
-#         self.__fonts = { 'mono': font.load('Mono', 20) }
+
+class HUD(object):
+
+    def __init__(self, winSize):
+        pass
+        # self.__winSize = winSize
+        # self.__fonts = { 'mono': font.load('Mono', 20) }
 
 #     width = property(lambda self: self.__winSize[0])
 #     height = property(lambda self: self.__winSize[1])
 
-#     def update(self, dt):
-#         # aktualizuj hud
-#         # ...
-#         pass
+    def update(self, dt):
+        pass
 
-#     def draw(self):
+    def draw(self):
+        pass
 #         self.text = font.Text(
 #             self.__fonts['mono'],
 #             ("%.1f" % clock.get_fps() ),

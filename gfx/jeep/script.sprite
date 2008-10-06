@@ -2,8 +2,6 @@
 
 -- wcięcia z lewej strony "jedynie" poprawiają czytelność
 
-FILE = "carsprite.png"   -- animacje znajdują się w pliku "xxx.png"
-
 ANIMATION = "" -- domyślny stan
 --       Y_OFFSET = 0   -- 0 jest domyślnie, więc można pominąć
 --       X_OFFSET = 0   -- 0 jest domyślnie, więc można pominąć

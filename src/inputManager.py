@@ -29,6 +29,10 @@ class InputManager(object):
 
             
     def key_pressed(self, symbol, modifier):
+        ''' Ta metoda powinna być wywoływana tylko przez pyglet
+        ustawia się tak:
+        window.on_key_press = lambda symbol, modifiers: manager.key_pressed(symbol, modifiers)
+        '''
         # Niestety pyglet robi dziwne rzeczy przy kombinacji shift + litera
         if modifier & pyglet_shift_code or modifier & pyglet_capslock_code: return
         
@@ -39,6 +43,10 @@ class InputManager(object):
 
         
     def key_released(self, symbol, modifier):
+        ''' Ta metoda powinna być wywoływana tylko przez pyglet
+        ustawia się tak:
+        window.on_key_release = lambda symbol, modifiers: manager.key_pressed(symbol, modifiers)
+        '''        
         # Niestety pyglet robi dziwne rzeczy przy kombinacji shift + litera        
         if modifier & pyglet_shift_code or modifier & pyglet_capslock_code: return
         
@@ -49,19 +57,27 @@ class InputManager(object):
 
         
     def register_observer(self, observer):
-        if isinstance(observer, InputObserver) and not observer in self.__observers:
+        ''' Rejestruje obserwatora wejścia '''
+        try: isinstance(observer, InputObserver),
+        except TypeError, msg: print msg, "Próba dodania obserwatora wejścia, który nie implementuje interfejsu InputObserver"
+        
+        if not observer in self.__observers:
             self.__observers.append(observer)
-
             
     def unregister_observer(self, observer):
+        ''' Usuwa obserwatora wejścia z listy obserwatorów '''
         if observer in self.__observers:
             self.__observers.remove(observer)
 
             
     def get_key_state(self, keyname):
+        ''' Zwraca stan klawisza `keyname` '''
         if not self.__assert(self.__keys_state.has_key(keyname), "Nieznana nazwa klawisza: " + keyname): return False
         return self.__keys_state[keyname]
 
+    #
+    # Poniższe metody nie należą do interfejsu. Należy zakładać, że nie istnieją
+    #
     
     def __key_symbol_to_string(self, symbol):
         return self.__key_codes[symbol]

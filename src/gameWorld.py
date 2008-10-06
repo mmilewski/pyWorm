@@ -1,27 +1,45 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from collisionManager import CollisionManager
-from spriteManager import SpriteManager
-from gameObject import GameObject
 from pyglet.gl import *
+
+import sys
+sys.path.append("game_objects/") # konieczne do korzystania z game_objectów
+
+# zarządcy
+from collisionManager import CollisionManager
+from levelManager import LevelManager
+from spriteManager import SpriteManager
+
+# obiekty gry
+from supportedObjects import add_supported_objects_to_factory
+from gameObjectFactory import GameObjectFactory
+from gameObject import GameObject
+from playerGameObject import PlayerGameObject, PlayerHeliAIStrategy, PlayerHeliCreator
+
+# sprite'y
+from spriteStrategy import SpriteScriptStrategy
+from spriteScriptParser import SpriteScriptParser
 
 
 class GameWorld(object):
 
-    def __init__(self):
-        # lista obiektów w świecie
-        self.__objects = []
+    def __init__(self, theApp):
+        ''' theApp: refernecja do obiektu aplikacji. Potrzebne przy dodawaniu obiektu nasłuchującego wejścia '''
 
-        # menadżer kolizji
-        self.__collisionManager = CollisionManager()
+        self.__theApp = theApp                                              # obiekt zarządzający aplikacją
+        self.__objects = []                                                 # lista obiektów w świecie
+        
+        self.__collisionManager = CollisionManager()                        # menadżer kolizji
+        self.__spriteManager    = SpriteManager()                           # menadżer sprite'ów
+        self.__objectFactory    = self.__create_object_factory()            # fabryka obiektów
+        self.__levelManager     = LevelManager(self.__objectFactory)        # menadżer poziomów
+        
+        self.__levelManager.load_level("test_level")
 
-        # menadżer sprite'ów
-        self.__spriteManager = SpriteManager()
-
-    collisionManager = property( lambda self: self.__collisionManager )
-    spriteManager = property( lambda self: self.__spriteManager )
-
+        # Dodaj obiekt helikoptera i jeepa do gry
+        self.add_object(self.__create_heli())
+        
 
     def add_object(self, gameobject):
         ''' Dodaje obiekt do świata. Sprawdza typ dodawanego obiektu. '''
@@ -29,7 +47,7 @@ class GameWorld(object):
         except TypeError, msg: print msg, "Dodawany obiekt nie jest typu GameObject."
 
         self.__objects.append( gameobject )
-        self.collisionManager.add_object( gameobject )
+        self.__collisionManager.add_object( gameobject )
 
 
     def remove_object(self, gameobject):
@@ -39,89 +57,88 @@ class GameWorld(object):
             self.collisionManager.remove_object( gameobject )
 
 
+    def create_object(self, objName):
+        ''' Tworzy obiekt o zadanej nazwie korzystając z fabryki
+        obiektów.  '''
+        return self.__objectFactory.create_object( objName )
+        
+            
     def update(self, dt):
         ''' Aktualizuje obiekty ze świata. '''
+        self.__objects = filter(lambda o: not o.isDestroyed() , self.__objects)
+        
         self.check_collisions()
         for obj in self.__objects:
             obj.update( dt )
 
-
-    def __draw_rect(self, texCoords, frameRect, scrPos):
-        ''' Rysuje czworokąt texCoords z aktualnej tekstury na ekranie w miejscu
-        scrPos. Pozycja i wymiary czworokąta opisane są przez frameRect (x-lewo,y-dół,x-prawo,y-góra). '''
-        if not len(texCoords)==4:
-            print "Error: __draw_rect, zła ilość współrzędnych w texCoords (%d zamiast %d)"%(len(texCoords),4)
-            return
-        if not len(frameRect)==4:
-            print "Error: __draw_rect, zła ilość współrzędnych w frameRect (%d zamiast %d)"%(len(frameRect),4)
-            return
-        if not len(scrPos)==3:
-            print "Error: __draw_rect, zła ilość współrzędnych w scrPos (%d zamiast %d)"%(len(scrPos),3)
-            return
-        # ustaw OpenGL
-        glColor4f( 1, 1, 1, 1 )
-        glEnable( GL_BLEND )
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
-        # narysuj oteksturowany czworokąt
-        glTranslatef( *scrPos )
-        left,bottom,right,top = texCoords
-        tc = ( (left,bottom), (right,bottom), (right,top), (left,top) )
-        left,bottom,right,top = frameRect
-        vs = ( (left,bottom), (right,bottom), (right, top), (left, top) )
-        glBegin( GL_QUADS )
-        for t,v in zip(tc,vs):
-            glTexCoord2f( *t )
-            glVertex2f( *v )
-        glEnd()
-
-
+            
     def draw(self):
         ''' Rysuje wszystkie obiekty w świecie. '''
-        glClearColor( 1, .5, 0, 0 )
+        glClearColor( 0, 0, 1, 0 )
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
+        glEnable( GL_BLEND )
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
+        
         for obj in self.__objects:
-            sname    = obj.spriteName
-            animName = obj.get_animation_name()
-            frameNum = obj.get_current_frame_num()
-            frame = self.spriteManager.get_frame( sname, animName, frameNum )
+            spriteName  = obj.spriteName
+            animName    = obj.get_current_animation_name()
+            frameNum    = obj.get_current_frame_num()
+            frame     = self.__spriteManager.get_frame( spriteName, animName, frameNum )
+            
+            (tc,vs)   = self.__compute_tex_vertex_coords( obj, frame )
+            textureId = frame.textureId
             
             glPushMatrix()
+            glEnable( GL_TEXTURE_2D )
+            glBindTexture( GL_TEXTURE_2D, textureId )
+            
+            glBegin( GL_QUADS )
+            for t,v in zip(tc,vs):
+                glTexCoord2f( *t )
+                glVertex2f( *v )
+            glEnd()
 
-#             # -- cut here --
-#             texId = frame.textureId
-#             glEnable( GL_TEXTURE_2D )
-#             glBindTexture( GL_TEXTURE_2D, texId )
-#             left,bottom,right,top = 0,0,1,1
-#             tc = ( (left,bottom), (right,bottom), (right,top), (left,top) )
-#             left,bottom,right,top = .2,.2,.7,.7
-#             vs = ( (left,bottom), (right,bottom), (right, top), (left, top) )
-#             glBegin( GL_QUADS )
-#             for t,v in zip(tc,vs):
-#                 glTexCoord2f( *t )
-#                 glVertex2f( *v )
-#             glEnd()
-#             # -- cut here --
-
-            texId = frame.textureId
-#             print "Debug: draw", texId, texId.__class__
-            if glIsTexture( texId ):
-                glEnable( GL_TEXTURE_2D )
-                glBindTexture( GL_TEXTURE_2D, texId )
-            else:
-                print "Error: rysując `%s` okazało się, że texId nie wskazuje na teskturę"%sname
-            self.__draw_rect( frame.rect, (0, 0, .5, .5), (0,0,0) )
-
+            glDisable( GL_TEXTURE_2D )
             glPopMatrix()
 
-#         print "-"*50
 
+    def __compute_tex_vertex_coords(self, obj, frame):
+        ''' zwraca parę (współrzędne tekstury, współrzędne wierzchołka) dla obiektu `obj` '''
+
+        tex_left, tex_bottom, tex_right, tex_top = frame.rect
+        winWidth, winHeight = self.__theApp.get_window_dim()
+        
+        vertex_left, vertex_bottom = obj.position
+        vertex_right = vertex_left + frame.width / winWidth
+        vertex_top = vertex_bottom - frame.height / winHeight
+        
+        tc = ( (tex_left, tex_bottom), (tex_right, tex_bottom), (tex_right, tex_top), (tex_left, tex_top) )
+        vs = ( (vertex_left, vertex_bottom), (vertex_right, vertex_bottom), (vertex_right, vertex_top), (vertex_left, vertex_top) )
+
+        return (tc,vs)
+    
 
     def check_collisions(self):
         ''' Pobiera pary kolidujących obiektów i nakazuje obsługę któremuś z nich. '''
-        collPairs = self.collisionManager.get_colliding_objects()
+        collPairs = self.__collisionManager.get_colliding_objects()
         for a,b in collPairs:
-            if not a==b:
+            if a != b:
                 a.collide(b)
+
+                
+    def __create_object_factory(self):
+        ''' Tworzy instancję fabryki obiektów '''
+        objFactory = GameObjectFactory()
+        add_supported_objects_to_factory(objFactory)
+        return objFactory
+
+
+    def __create_heli(self):
+        creator = PlayerHeliCreator( self.__theApp, self, self.__spriteManager, self.__objectFactory )
+        heli = creator.create( 'heli' )
+        heli.position = (0.1, 0.7)
+        
+        return heli

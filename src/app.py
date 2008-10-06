@@ -4,83 +4,64 @@
 from pyglet import clock, font, image, window
 from pyglet.gl import *
 
-from collisionManager import CollisionManager
-from spriteManager import SpriteManager
-from gameObject import Triangle
+from hud import HUD
 from gameWorld import GameWorld
 from camera import Camera
-from spriteStrategy import SpriteScriptStrategy
-from spriteScript import SpriteScript
+from inputManager import InputManager
+
 
 class App(object):
 
     def __init__(self):
-        self.__world = GameWorld()
         fullscreen = False
         vsync = True
         
         if fullscreen:
-            self.win = window.Window( fullscreen=True, vsync=vsync )
+            self.__window = window.Window( fullscreen=True, vsync=vsync )
         else:
-            self.win = window.Window( width=800, height=600, fullscreen=False, vsync=vsync )
+            self.__window = window.Window( width=800, height=600, fullscreen=False, vsync=vsync )
 
-        winSize = ( self.win.width, self.win.height )
-        print "Utworzono okno o rozmiarze:", winSize, "Fullscreen:", fullscreen
-        self.camera = Camera( winSize )
-        print "Wymiary w 3d: ", self.camera.windowCoords, "(lewy, szerokość, dół, wysokość)"
-#         self.hud = Hud( winSize )
-#         clock.set_fps_limit(50)
+        winSize = ( self.__window.width, self.__window.height )
 
-        # dodaj obiekty do świata
-        self.add_objects()
+        self.__camera = Camera( winSize )
+        self.__hud    = HUD( winSize )
 
-    world = property( lambda self:self.__world )
+        self.__inputManager = InputManager()
+        self.__window.on_key_press   = self.__inputManager.key_pressed
+        self.__window.on_key_release = self.__inputManager.key_released
 
-
-    def __add_scripted_object( self, spriteName, object ):
-        scriptFilename = spriteName + '.sprite'
-        object.spriteName = spriteName
-        # załaduj skrypt
-        script = SpriteScript()
-        script.load_from_file( scriptFilename, resourceDir='../gfx' )
-        # dodaj strategię na podstawie skryptu
-        object.spriteStrategy = SpriteScriptStrategy( script )
-
-        #
-        # FIXME
-        # rozdzielenie skryptu na skrypt do zmiany stanu animacji i skrypt do
-        # wyświetlania animacji
-        #
-
-        # dodaj skrypt do menadżera skryptów
-        self.world.spriteManager.add_script( object.spriteName, script )
-        # dodaj obiekt do świata
-        self.world.add_object( object )
+        # clock.set_fps_limit(50) # FIXME: ??? usunąć to ???
+        
+        self.__world  = GameWorld(self)        # to musi być na końcu
 
 
-    def add_objects(self):
-        self.__add_scripted_object( 'bang', Triangle() )
+    def register_input_observer(self, obj):
+        self.__inputManager.register_observer(obj)
 
+    def get_window_dim(self):
+        ''' zwraca wymiary okna (width, height) '''
+        return (float(self.__window.width), float(self.__window.height))
+        
     def main_loop(self):
         ''' Pętla główna gry. '''
-        while not self.win.has_exit:
-            self.win.dispatch_events()
+        while not self.__window.has_exit:
+            self.__window.dispatch_events()
 
             # update świata i HUDa
             dt = clock.tick()
-            self.world.update( dt )
-#             self.hud.update( dt )
+            self.__world.update( dt )
+            self.__hud.update( dt )
 
             # narysuj świat
-            self.camera.set3d()
-            self.world.draw()
+            self.__camera.set3d()
+            self.__world.draw()
 
             # narysuj HUD
-            self.camera.set2d()
-#             self.hud.draw()
+            self.__camera.set2d()
+            self.__hud.draw()
 
-            self.win.flip()
-
+            self.__window.flip()
+            
 app = App()
 app.main_loop()
 
