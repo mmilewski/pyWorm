@@ -35,7 +35,7 @@ class SpriteScriptParser(object):
     informacje '''
 
     def __init__(self, spriteName):
-        self.__filename = '../gfx/' + spriteName + '/script.sprite'
+        self.__filename = os.path.join('..','gfx',spriteName,'script.sprite')
         self.__logic_part = {}  # słownik nazwa_animacji => SpriteLogicInfo
         self.__sprite_part = {} # słownik nazwa_animacji => SpriteAnimationInfo
         self.__spriteLoaded = False # czy sprite został już załadowany
