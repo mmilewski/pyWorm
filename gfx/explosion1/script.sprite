@@ -1,0 +1,11 @@
+-- -*- mode:haskell; coding: utf-8 -*-
+
+FILE = "explosion1.png"
+
+ANIMATION = ""
+--       Y_OFFSET = 0
+--       X_OFFSET = 0
+      FRAME = 35, 50
+      FRAMES_COUNT = 17
+      COLS_COUNT = 6
+      DURATION = 300
