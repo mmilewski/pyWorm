@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#
-# Moduł parsujący plik skryptu sprite'a
-#
+'''
+Moduł parsujący plik skryptu sprite'a.
+'''
 
 import re
 import os.path
@@ -140,7 +140,7 @@ class SpriteScriptParser(object):
         
         elif reKey == 'anim':           # definicja nowej animacji
             animationName = matchResult
-            self.__logic_part[ animationName ] = SpriteAnimationInfo()
+            self.__logic_part[ animationName ] = SpriteLogicInfo()
             self.__sprite_part[ animationName ] = SpriteAnimationInfo()
             
         else:         # jakaś komenda w animacji
