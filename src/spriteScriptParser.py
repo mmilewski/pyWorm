@@ -5,6 +5,7 @@
 Moduł parsujący plik skryptu sprite'a.
 '''
 
+from __future__ import with_statement
 import re
 import os.path
 
@@ -57,8 +58,10 @@ class SpriteScriptParser(object):
     def parse(self):
         ''' Parsuje plik skryptu. Wyciąga z niego wszystkie informacje
         potrzebne do zarządzania spritem i wyświetlania go '''
-        
         lines = self.__split_script()       # podziel skrypt na linie
+        if not lines: return False
+        self.__spriteLoaded = False
+
         (rs, commentStr) = self.__create_regex_table() # stwórz tablicę wyrażeń regularnych
 
         # przetwarzanie wczytanych danych
@@ -92,15 +95,14 @@ class SpriteScriptParser(object):
     def __split_script(self):
         ''' Dzieli plik skryptu na linie '''
         lines = None      # linie wczytane z pliku
-        
-        try:
-            f = open(self.__filename,'rU')
-            lines = f.readlines()
-            f.close()
+
+        try: 
+            with open(self.__filename,'rU') as f:
+                lines = f.readlines()
         except:
             print "ERROR: nieznaleziono pliku sprite\'a lub plik jest uszkodzony:", self.__filename
 #            raise "" ???
-            
+        
         return lines
             
 
