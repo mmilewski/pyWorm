@@ -8,7 +8,7 @@ ANIMATION = "default"
       FRAME_HEIGHT = 90
       FRAMES_COUNT = 7
       COLS_COUNT = 7
-      DURATION = 18
+      DURATION = 200
 
 ANIMATION = "pochyla sie przod"
       Y_OFFSET = 90
@@ -17,7 +17,7 @@ ANIMATION = "pochyla sie przod"
       FRAME_HEIGHT = 90
       FRAMES_COUNT = 3
       COLS_COUNT = 3
-      DURATION = 50
+      DURATION = 200
 
 ANIMATION = "leci przod pochylony"
       Y_OFFSET = 180
@@ -26,7 +26,7 @@ ANIMATION = "leci przod pochylony"
       FRAME_HEIGHT = 90
       FRAMES_COUNT = 7
       COLS_COUNT = 7
-      DURATION = 100
+      DURATION = 200
 
 ANIMATION = "pochyla sie tyl"
       Y_OFFSET = 270
@@ -35,7 +35,7 @@ ANIMATION = "pochyla sie tyl"
       FRAME_HEIGHT = 90
       FRAMES_COUNT = 3
       COLS_COUNT = 3
-      DURATION = 50
+      DURATION = 200
 
 ANIMATION = "leci tyl pochylony"
       Y_OFFSET = 360
@@ -44,7 +44,7 @@ ANIMATION = "leci tyl pochylony"
       FRAME_HEIGHT = 90
       FRAMES_COUNT = 7
       COLS_COUNT = 7 
-      DURATION = 100
+      DURATION = 200
 
 
 

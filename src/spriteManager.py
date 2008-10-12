@@ -61,14 +61,15 @@ class SpriteManager:
         texWidth  = self.__sprites[ spriteName ][ 2 ]
         texHeight = self.__sprites[ spriteName ][ 3 ]
 
-        # oblicz współrzędne lewego dolnego rogu
-        texLeft   = animation.x_offset + frameNum * animation.frame_width # pozycja, jeżeli pominiemy możliwość wielu wierszy na animację
-        texBottom = animation.y_offset + (texLeft / (animation.cols_count * animation.frame_width)) * animation.frame_height
-        texLeft  %= animation.cols_count * animation.frame_width
-
-        # oblicz współrzędne prawego górnego rogu
+        texLeft   = animation.x_offset + frameNum * animation.frame_width
+        texTop    = texHeight - animation.y_offset
+        if animation.x_offset + frameNum * animation.frame_width >= texWidth:
+            frameNum -= (texWidth - animation.x_offset) / animation.frame_width
+            texLeft  %= animation.cols_count * animation.frame_width
+            texTop   += (frameNum / animation.cols_count) *  animation.frame_height
+            
         texRight  = texLeft + animation.frame_width
-        texTop    = texBottom - animation.frame_height
+        texBottom = texTop - animation.frame_height
 
         # normalizacja współrzędnych (przejście z width i height do 0..1)
         texLeft   /= texWidth
@@ -80,7 +81,7 @@ class SpriteManager:
         textureId = self.__sprites[ spriteName ][ 0 ]
 
         return SpriteAnimationFrame( textureId,
-                                     (texLeft, texBottom, texRight, texTop),
+                                     (texLeft, texTop, texRight, texBottom),
                                      animation.frame_width,
                                      animation.frame_height )
 
