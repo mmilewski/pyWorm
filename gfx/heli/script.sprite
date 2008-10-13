@@ -18,6 +18,7 @@ ANIMATION = "pochyla sie przod"
       FRAMES_COUNT = 3
       COLS_COUNT = 3
       DURATION = 200
+      NEXT_ANIMATION = "leci przod pochylony"
 
 ANIMATION = "leci przod pochylony"
       Y_OFFSET = 180
@@ -36,6 +37,7 @@ ANIMATION = "pochyla sie tyl"
       FRAMES_COUNT = 3
       COLS_COUNT = 3
       DURATION = 200
+      NEXT_ANIMATION = "leci tyl pochylony"
 
 ANIMATION = "leci tyl pochylony"
       Y_OFFSET = 360

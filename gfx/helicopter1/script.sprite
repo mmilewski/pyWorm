@@ -2,7 +2,7 @@
 
 FILE = "spritehelikopter1.png"
 
-ANIMATION = ""
+ANIMATION = "default"
 --       Y_OFFSET = 0
 --       X_OFFSET = 0
       FRAME = 161, 96

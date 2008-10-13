@@ -27,6 +27,9 @@ class SpriteScriptStrategy( object ):
 
     
     def set_animation(self, animName):
+        if animName == self.__animationName: return
+        if self.__spriteScript[ animName ].next_animation == self.__animationName: return
+        
         self.__animationName = animName
         self.__curFrameNum   = 0
         self.__animationDuration = 0.0
@@ -45,19 +48,5 @@ class SpriteScriptStrategy( object ):
             self.__finish_current_animation()
 
 
-    #
-    # Zarządzanie informacjami o zakończonych animacjach
-    #
-    # Nie należy polegać na obecnych implementacjach tych metod (w
-    # tym przypadku szczególnie) - mogą się znacznie zmienić.
-    # 
-            
-    def clear_finished_animation(self):
-        self.__lastFinishedAnimationName = None
-
-    def get_last_finished_animation_name(self):
-        return self.__lastFinishedAnimationName
-        
     def __finish_current_animation(self):
-        self.__lastFinishedAnimationName = self.__animationName
-
+        self.set_animation(self.__spriteScript[ self.__animationName ].next_animation)

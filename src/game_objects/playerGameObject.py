@@ -30,7 +30,7 @@ class PlayerHeliAIStrategy(AIStrategy, InputObserver):
         self.__actionFire     = False            # czy gracz strzela
         self.__actionAutofire = False            # czy gracz cały czas ma strzelać
         self.__coolDown       = 0.0              # ile trzeba odczekaż aby móc znów wystrzelić
-        self.__coolDownTime   = 0.13              # czas na jaki jest ustawiane __coolDown po każdym strzale
+        self.__coolDownTime   = 0.2              # czas na jaki jest ustawiane __coolDown po każdym strzale
         
         self.__gameObject     = gameObject       # refrencja do obiektu, którym strategia zarządza
         self.__spriteStrategy = spriteStrategy   # referencja do strategii sprite'a obiektu gameObject
@@ -40,15 +40,6 @@ class PlayerHeliAIStrategy(AIStrategy, InputObserver):
 
         
     def update(self, dt):
-        # zajmij się powiązanymi animacjami
-        lastFinishedAnimation = self.__spriteStrategy.get_last_finished_animation_name()
-        if lastFinishedAnimation == 'pochyla sie przod':
-            self.__spriteStrategy.set_animation('leci przod pochylony')
-        elif lastFinishedAnimation == 'pochyla sie tyl':
-            self.__spriteStrategy.set_animation('leci tyl pochylony')
-
-        self.__spriteStrategy.clear_finished_animation()
-
         # obsłuż broń
         self.__coolDown -= dt
         if self.__coolDown < 0.0:
@@ -63,8 +54,9 @@ class PlayerHeliAIStrategy(AIStrategy, InputObserver):
     def __fire(self):
         rocket = self.__gameWorld.create_object( 'heli_rocket' )
         (xPos, yPos) = self.__gameObject.position
+        (xVel, yVel) = self.__gameObject.velocity
         xPos += 0.15
-        yPos -= 0.08
+        yPos -= 0.10
         rocket.position = (xPos, yPos)
         rocket.velocity = (0.8, 0.0)
         self.__gameWorld.add_object( rocket )
@@ -73,25 +65,20 @@ class PlayerHeliAIStrategy(AIStrategy, InputObserver):
     def notify_input(self, subject):
         xVel, yVel = 0.0, 0.0
 
-        anim = self.__spriteStrategy.get_animation_name()
-
         # obsługa animacji
         if subject.get_key_state('left'):
-            if anim != 'pochyla sie tyl' and anim != 'leci tyl pochylony':
-                self.__spriteStrategy.set_animation('pochyla sie tyl')
+            self.__spriteStrategy.set_animation('pochyla sie tyl')
 
         if subject.get_key_state('right'):
-            if anim != 'pochyla sie przod' and anim != 'leci przod pochylony':
-                self.__spriteStrategy.set_animation('pochyla sie przod')
+            self.__spriteStrategy.set_animation('pochyla sie przod')
 
         if not (subject.get_key_state('left') or subject.get_key_state('right')):
-            if not anim == 'default':
-                self.__spriteStrategy.set_animation('default')
+            self.__spriteStrategy.set_animation('default')
                     
         # obsługa kierunku lotu
-        if subject.get_key_state('up'): yVel =  0.4
-        if subject.get_key_state('down'): yVel = -0.4
-        if subject.get_key_state('right'): xVel =  0.4
+        if subject.get_key_state('up'): yVel =  0.35
+        if subject.get_key_state('down'): yVel = -0.35
+        if subject.get_key_state('right'): xVel =  0.35
         if subject.get_key_state('left'): xVel = -0.25
         self.__gameObject.velocity  = (xVel, yVel)
         

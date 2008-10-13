@@ -14,9 +14,10 @@ class SpriteLogicInfo(object):
     inforamcje potrzebne przy zmianie stanu animacji (np. zmianie
     klatki) '''
 
-    def __init__(self):
-        self.frames_count = None
-        self.duration     = None
+    def __init__(self, nextAnimation):
+        self.frames_count   = None
+        self.duration       = 200
+        self.next_animation = nextAnimation
 
         
 class SpriteAnimationInfo(object):
@@ -24,8 +25,8 @@ class SpriteAnimationInfo(object):
     klatki animacji z tekstury '''
     
     def __init__(self):
-        self.x_offset     = None
-        self.y_offset     = None
+        self.x_offset     = 0
+        self.y_offset     = 0
         self.fame_width   = None
         self.frame_height = None
         self.cols_count   = None
@@ -119,7 +120,8 @@ class SpriteScriptParser(object):
             'frame_height': '\s*FRAME_HEIGHT\s*=\s*([0-9]+)\s*$',
             'cols'        : '\s*COLS_COUNT\s*=\s*([0-9]+)\s*$',
             'xoff'        : '\s*X_OFFSET\s*=\s*([0-9]+)\s*$',
-            'yoff'        : '\s*Y_OFFSET\s*=\s*([0-9]+)\s*$'
+            'yoff'        : '\s*Y_OFFSET\s*=\s*([0-9]+)\s*$',
+            'next_anim'   : '\s*NEXT_ANIMATION\s*=\s*[\'"](.*?)[\'"]\s*$'            
             }
         
         return (rs, commentStr)
@@ -142,7 +144,7 @@ class SpriteScriptParser(object):
         
         elif reKey == 'anim':           # definicja nowej animacji
             animationName = matchResult
-            self.__logic_part[ animationName ] = SpriteLogicInfo()
+            self.__logic_part [ animationName ] = SpriteLogicInfo(animationName)
             self.__sprite_part[ animationName ] = SpriteAnimationInfo()
             
         else:         # jakaś komenda w animacji
@@ -151,14 +153,15 @@ class SpriteScriptParser(object):
                 return False
             
             # Instrukcje związane z logiką
-            if reKey == 'duration'         : self.__logic_part[ animationName ].duration      = matchResult
-            elif reKey == 'frames_count'   : self.__logic_part[ animationName ].frames_count  = matchResult
+            if reKey == 'duration'         : self.__logic_part[ animationName ].duration       = matchResult
+            elif reKey == 'frames_count'   : self.__logic_part[ animationName ].frames_count   = matchResult
+            elif reKey == 'next_anim'      : self.__logic_part[ animationName ].next_animation = matchResult
             
             # Instrukcje związane z samą animacją
-            elif reKey == 'frame_width'    : self.__sprite_part[ animationName ].frame_width  = matchResult
-            elif reKey == 'frame_height'   : self.__sprite_part[ animationName ].frame_height = matchResult
-            elif reKey == 'cols'           : self.__sprite_part[ animationName ].cols_count   = matchResult
-            elif reKey == 'xoff'           : self.__sprite_part[ animationName ].x_offset     = matchResult
-            elif reKey == 'yoff'           : self.__sprite_part[ animationName ].y_offset     = matchResult
+            elif reKey == 'frame_width'    : self.__sprite_part[ animationName ].frame_width   = matchResult
+            elif reKey == 'frame_height'   : self.__sprite_part[ animationName ].frame_height  = matchResult
+            elif reKey == 'cols'           : self.__sprite_part[ animationName ].cols_count    = matchResult
+            elif reKey == 'xoff'           : self.__sprite_part[ animationName ].x_offset      = matchResult
+            elif reKey == 'yoff'           : self.__sprite_part[ animationName ].y_offset      = matchResult
 
         return animationName
