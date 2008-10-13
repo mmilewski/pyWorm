@@ -86,7 +86,7 @@ class GameWorld(object):
         obiektów.  '''
         return self.__objectFactory.create_object( objName )
         
-            
+           
     def update(self, dt):
         ''' Aktualizuje obiekty ze świata. '''
 
@@ -124,6 +124,17 @@ class GameWorld(object):
             textureId = frame.textureId
             
             glPushMatrix()
+
+            # narysuj tło pod sprite'em (do celów testowych)
+            if( obj.display_pad() ):
+                glDisable( GL_TEXTURE_2D )
+                glColor3f( .3, .3, .4 )     # ew. kolor może być skądś pobierany
+                glBegin( GL_QUADS )
+                for v in vs:
+                    glVertex2f( *v )
+                glEnd()
+
+            # wyświetlenie czworokąta/sprite'a
             glEnable( GL_TEXTURE_2D )
             glBindTexture( GL_TEXTURE_2D, textureId )
             

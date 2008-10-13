@@ -99,6 +99,10 @@ class GameObject(object):
         self.__destroyed = False         # czy obiekt jest zniszczony i powinien być zdjęty z listy obiektów?
 
 
+    def display_pad(self):
+        ''' Zwraca informację o tym, czy podkładka ma być wyświetlona,
+        tzn. czy pod sprite'm ma być wyświetlony jego aabb. Domyślnie tak.'''
+        return True
         
     def __set_vel(self, vel): self.__vel = vel
     velocity = property(lambda self: self.__vel,
