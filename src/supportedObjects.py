@@ -8,5 +8,18 @@
 # nowego prototypu do gry
 #
 
-def add_supported_objects_to_factory(objFactory):
-    pass
+import sys
+sys.path.append("../")
+
+from helicopter1 import Helicopter1Creator
+
+
+def add_supported_objects_to_factory(objFactory, spriteManager):
+
+    # definicja pomocniczej funkcji dodającej obiekt
+    def add_object(objFactory, name, creator):
+        obj = creator.create( name )
+        objFactory.register_game_object( obj, name )
+
+    # Dodawanie obiektów
+    add_object(objFactory, 'helicopter1', Helicopter1Creator(spriteManager))

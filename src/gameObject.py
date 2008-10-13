@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from copy import deepcopy
+
 from spriteStrategy import SpriteScriptStrategy
 from spriteScriptParser import SpriteScriptParser
 
@@ -85,13 +87,10 @@ class GameObjectCreator(object):
         '''
         pass
 
-
-    
     
 class GameObject(object):
 
     def __init__(self):
-        self.__aabb = None               # krotka (pozycjaX,pozycjaY,szerokość, wysokość)
         self.__spriteName = None         # nazwa sprit'a przypisana do obiektu
         self.__pos = None                # pozycja obiektu (lewy dolny róg). Para (xPos, yPos)
         self.__vel = (0.0, 0.0)          # wektor prędkości. Para (xVel, yVel)
@@ -99,32 +98,34 @@ class GameObject(object):
         self.__spriteStrategy = None     # strategia zarządzająca stanem animacji (SpriteStrategy)
         self.__destroyed = False         # czy obiekt jest zniszczony i powinien być zdjęty z listy obiektów?
 
-        
-    def set_aabb(self,val): self.__aabb = val
-    aabb = property(lambda self:self.__aabb,
-                    set_aabb )
 
+        
     def __set_vel(self, vel): self.__vel = vel
     velocity = property(lambda self: self.__vel,
                         __set_vel)
 
+    
     def __set_pos(self, pos): self.__pos = pos
     def get_pos(self): return self.__pos
     position = property(lambda self: self.__pos,
                         __set_pos)    
-        
+
+    
     def set_sprite_name(self, val): self.__spriteName = val
     spriteName = property(lambda self: self.__spriteName,
                           set_sprite_name)
 
+    
     def set_ai_strategy(self, val): self.__aiStrategy = val
     aiStrategy = property(lambda self: self.__aiStrategy,
                           set_ai_strategy)
+
     
     def set_sprite_strategy(self,val): self.__spriteStrategy = val
     spriteStrategy = property(lambda self: self.__spriteStrategy,
                               set_sprite_strategy)
-        
+
+    
     def get_current_animation_name(self):
         if self.__spriteStrategy:
             return self.__spriteStrategy.get_animation_name()
@@ -144,11 +145,32 @@ class GameObject(object):
     def clone(self):
         abstract
 
+        
+    def clone_base(self, obj):
+        ''' Klonuje część obiektu, która należy do klasy GameObject
 
+        UWAGA: Ta metoda jest chroniona!!! Nie należy do
+        interfejsu. Nie używaj poza hierarchią klas GameObject'''
+        
+        obj.spriteName     = self.spriteName
+        obj.position       = self.position
+        obj.velocity       = self.velocity
+        obj.spriteStrategy = deepcopy(self.spriteStrategy)
+        obj.aiStrategy     = deepcopy(self.aiStrategy)
+        obj.aiStrategy.set_game_object(obj)
+        
+        return obj
+
+    
+    def hit(self, damage):
+        ''' Obsługa trafienia z siłą 'damage' '''
+        abstract
+
+        
     def destroy(self):
         self.__destroyed = True
-        pass
 
+    
     def isDestroyed(self):
         return self.__destroyed
 
@@ -174,12 +196,23 @@ class GameObject(object):
             print 'Error: ups, no scriptStrategy assigned.', self.__class__
 
 
-    def collide(self, object, calledByObject = False):
+    def collide(self, object, depth = 0):
         ''' Metoda obsługuje kolizję z object.
 
         object: Obiekt, z którym jest sprawdzana kolizja
         
-        calledByObject: Czy metoda została wywołana przez metodę
+        depth: 0 - metoda wywołana przez gameWorld, każda
+        większa wartość oznacza liczbę razy wywołań collide w
+        collide. Obiekt obsługując kolizję może wywołać colilde
+        drugiego obiektu. Powinien wtedy zwiększyć głębokość o 1
+
+        
         collide innego obiektu (True), czy przez zarządcę (False)
         '''
-        pass
+        if depth > 1: return
+        object.collide(self, depth + 1)
+
+
+class GameObjectEnemy(GameObject):
+    def __init__(self):
+        GameObject.__init__(self)

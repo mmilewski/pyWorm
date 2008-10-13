@@ -4,18 +4,24 @@
 from gameObject import GameObject
 
 class CollisionManager:
-    def __init__(self, gameObjects=[]):
+    def __init__(self, spriteManager, gameObjects = []):
         ''' Konstruktor. Można utworzyć z gotową listą obiektów. '''
         self.__objects = gameObjects
+        self.__spriteManager = spriteManager
 
+        
     def add_object( self, object ):
         ''' Dodaje obiekt do listy obiektów podlegających testowi kolizji. '''
         assert isinstance( object, GameObject ), "Nieprawidłowy typ"
+        self.__objects.append(object)
+        
 
     def remove_object( self, object ):
         ''' Usuwa obiekt z listy obiekt podlegających testowi kolizji. '''
         assert isinstance( object, GameObject ), "Nieprawidłowy typ"
+        self.__objects.remove(object)        
 
+        
     def get_colliding_objects( self ):
         ''' Zwaraca listę par kolidujących obiektów (kolidują aabb i perpixel).
         Wynik to lista par obiektów, które spełniają warunek:
@@ -23,40 +29,47 @@ class CollisionManager:
         pairs = []
         for o1 in self.__objects:
             for o2 in self.__objects:
-                if self.__check_aabb_collision(o1,o2):
-                    if self.__check_per_pixel_collision(o1,o2):
-                        pairs.append( (o1,o2) )
+                if o1 != o2:
+                    if self.__check_aabb_collision(o1,o2):
+                        if self.__check_per_pixel_collision(o1,o2):
+                            pairs.append( (o1,o2) )
         return pairs
 
+    
     def __check_aabb_collision( self, o1, o2 ):
         ''' Sprawdza czy aabb, obiektów przekazanaych w argumentach, przecinają się. '''
         assert isinstance( o1, GameObject ) and \
-            isinsance( o2, GameObject), "Niepoprawny typ"
-        return False
+            isinstance( o2, GameObject), "Niepoprawny typ"
 
+        (x1, y1, w1, h1) = self.__spriteManager.get_aabb(o1.spriteName, o1.get_current_animation_name(), o1.get_current_frame_num())
+        (x2, y2, w2, h2) = self.__spriteManager.get_aabb(o2.spriteName, o2.get_current_animation_name(), o2.get_current_frame_num())
+
+        dx1, dy1 = o1.get_pos()
+        dx2, dy2 = o2.get_pos()
+        x1 += dx1
+        y1 += dy1
+        x2 += dx2
+        y2 += dy2
+
+
+        x1 *= 800
+        x2 *= 800
+        y1 *= 600
+        y2 *= 600
+
+        isCollision = True
+        if y2 + h2 < y1: isCollision = False
+        if y1 + h1 < y2: isCollision = False
+        if x2 + w2 < x1: isCollision = False
+        if x1 + w1 < x2: isCollision = False
+            
+        return isCollision
+
+    
     def __check_per_pixel_collision( self, o1, o2 ):
         ''' Sprawdza czy obiekty zadane w argumentach kolidują per-pixel.
         Sprawdzenie kolizji jest delegowane do SpriteManagera. '''
         assert isinstance( o1, GameObject ) and \
-            isinsance( o2, GameObject), "Niepoprawny typ"
+            isinstance( o2, GameObject), "Niepoprawny typ"
 
-        return False
-
-
-class SpriteManager:
-    def __init__(self):
-        pass
-
-    def check_sprite_collision( self, spriteName1, spriteName2, delta ):
-        ''' Sprawdza czy jeżeli na sprite1 nałożymy sprite2 w pozycji delta
-        (jest to przesunięcie lewego dolnego rogu sprite2 względem lewego dolnego
-        rogu sprite1), to czy istnieją dwa pikesele które nachodzą na siebie
-        (czyli czy przecięcie miejsc gdzie oba nie mają kanału alfa 0 jest niepuste). '''
-        assert len(delta)==2 \
-            and isinsance(spriteName1,str) \
-            and isinsance(spriteName2,str), \
-            "Warning, prawdopodobnie zły typ argumentu. "
-
-
-
-### TESTS ###
+        return True

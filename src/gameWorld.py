@@ -15,7 +15,8 @@ from spriteManager import SpriteManager
 from supportedObjects import add_supported_objects_to_factory
 from gameObjectFactory import GameObjectFactory
 from gameObject import GameObject
-from playerGameObject import PlayerGameObject, PlayerHeliAIStrategy, PlayerHeliCreator
+from playerGameObject import PlayerGameObject
+from playerHeli import PlayerHeliAIStrategy, PlayerHeliCreator
 
 # sprite'y
 from spriteStrategy import SpriteScriptStrategy
@@ -30,17 +31,40 @@ class GameWorld(object):
         self.__theApp = theApp                                              # obiekt zarządzający aplikacją
         self.__objects = []                                                 # lista obiektów w świecie
         
-        self.__collisionManager = CollisionManager()                        # menadżer kolizji
         self.__spriteManager    = SpriteManager()                           # menadżer sprite'ów
-        self.__objectFactory    = self.__create_object_factory()            # fabryka obiektów
+        self.__collisionManager = CollisionManager(self.__spriteManager)    # menadżer kolizji
+        self.__objectFactory    = self.__create_object_factory(self.__spriteManager) # fabryka obiektów
         self.__levelManager     = LevelManager(self.__objectFactory)        # menadżer poziomów
         
         self.__levelManager.load_level("test_level")
 
         # Dodaj obiekt helikoptera i jeepa do gry
         self.add_object(self.__create_heli())
-        
 
+
+        
+        #
+        # FIXME: Do usunięcia (powinno być obsługiwane przez zarządcę poziomu
+        # 
+        obj = self.__objectFactory.create_object( 'helicopter1' )
+        obj.position = (0.7, 0.1)
+        self.add_object(obj)
+
+        obj = self.__objectFactory.create_object( 'helicopter1' )
+        obj.position = (0.7, 0.3)
+        self.add_object(obj)
+
+        obj = self.__objectFactory.create_object( 'helicopter1' )
+        obj.position = (0.7, 0.5)
+        self.add_object(obj)
+
+        obj = self.__objectFactory.create_object( 'helicopter1' )
+        obj.position = (0.45, 0.3)
+        self.add_object(obj)
+
+
+        
+        
     def add_object(self, gameobject):
         ''' Dodaje obiekt do świata. Sprawdza typ dodawanego obiektu. '''
         try: isinstance(gameobject, GameObject),
@@ -65,9 +89,17 @@ class GameWorld(object):
             
     def update(self, dt):
         ''' Aktualizuje obiekty ze świata. '''
+
+        # odfiltruj obiekty, które są zniszczone
+        for o in self.__objects:
+            if o.isDestroyed():
+                self.__collisionManager.remove_object(o)
         self.__objects = filter(lambda o: not o.isDestroyed() , self.__objects)
-        
+
+        # sprawdź kolizje
         self.check_collisions()
+
+        # aktualizuj stan obiektów
         for obj in self.__objects:
             obj.update( dt )
 
@@ -113,7 +145,7 @@ class GameWorld(object):
         
         vertex_left, vertex_bottom = obj.position
         vertex_right = vertex_left + frame.width / winWidth
-        vertex_top = vertex_bottom - frame.height / winHeight
+        vertex_top = vertex_bottom + frame.height / winHeight
         
         tc = ( (tex_left, tex_bottom), (tex_right, tex_bottom), (tex_right, tex_top), (tex_left, tex_top) )
         vs = ( (vertex_left, vertex_bottom), (vertex_right, vertex_bottom), (vertex_right, vertex_top), (vertex_left, vertex_top) )
@@ -129,16 +161,15 @@ class GameWorld(object):
                 a.collide(b)
 
                 
-    def __create_object_factory(self):
+    def __create_object_factory(self, spriteManager):
         ''' Tworzy instancję fabryki obiektów '''
         objFactory = GameObjectFactory()
-        add_supported_objects_to_factory(objFactory)
+        add_supported_objects_to_factory(objFactory, spriteManager)
         return objFactory
 
 
     def __create_heli(self):
         creator = PlayerHeliCreator( self.__theApp, self, self.__spriteManager, self.__objectFactory )
         heli = creator.create( 'heli' )
-        heli.position = (0.1, 0.7)
-        
+        heli.position = (0.1, 0.5)
         return heli
