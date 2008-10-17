@@ -86,7 +86,7 @@ class SpriteScriptParser(object):
                     animationName = self.__match_line(reKey, matchResult, animationName)
 
             if not lineMatches:
-                print 'ERROR: niepoprawna linia %d w pliku %s' % (i,self.filename)
+                print 'ERROR: niepoprawna linia %d w pliku %s' % (i,self.__filename)
                 return False
             
         self.__spriteLoaded = True
