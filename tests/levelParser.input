@@ -1,0 +1,44 @@
+-- -*- mode:haskell; coding:utf-8 -*-
+
+-- przykładowy poziom
+
+-- PROBLEMY:
+--   obecne wyrażenie regularne wymaga, żeby lista argumentów była nie tylko separowana przecinkiem, ale też się nim KOŃCZYŁA.
+
+-- definicja, znaczenie definicji zależy od kontekstu/użycia, tzn. kreacja, która korzysta z definicji
+-- wie czego się spodziewać.
+[LEVEL_NAME: "Nazwa poziomu",]
+
+-- kreacja: tworzy obiekt przekazując parametry
+{ OBJECT:                 -- dodaj obiekt
+    NAME  = "foo",        -- o nazwie `foo`
+    X_POS = 100,          -- w pozycji (100,20)
+    Y_POS = 20,           --
+}
+
+
+[ GRASS: "grass.sprite", "", ]      -- animacja jest w pliku grass.sprite jako domyślna
+[ STONE: "stone.sprite", "", ]
+[ BRIDGE: "bridge.sprite", "", ]
+[ GRASS_STONE: "grass.sprite", "stone", ]        -- animacja jest w pliku grass.sprite jako animacja stone
+[ STONE_GRASS: "stone.sprite", "grass", ]
+[ GRASS_BRIDGE: "grass.sprite","brigde", ]
+[ BRIDGE_GRASS: "bridge.sprite", "grass", ]
+
+-- kreacja: tworzy grunt. Kolejne elementy są tworzone zgodnie z tym co na liście.
+-- można tworzyć wiele elementów tego samego rodzaju pisząć ELEMENT
+{ GROUND:
+    STONE,     STONE_GRASS,
+    GRASS 2,   GRASS_BRIGDE,
+    BRIDGE,    BRIDGE_GRASS,
+}
+
+
+-- nie pamiętam znaczenia
+[ HILL: "plik z def. spritea dla zawzgorza", "", ]
+{ MIDGROUND:
+    HILL 10,
+}
+
+
+{ NO_BG_SCROLL: 5000, }  -- przestań przesuwać tło to 5s, (np. dlatego, że będzie boss)
