@@ -1,44 +1,55 @@
--- -*- mode:haskell; coding:utf-8 -*-
+<!-- -*- mode:xml -*- -->
 
--- przykładowy poziom
+<level>
+  <header>
+    <name>Break the ice</name>
+    <author>/dev/random</author>
+  </header>
 
--- PROBLEMY:
---   obecne wyrażenie regularne wymaga, żeby lista argumentów była nie tylko separowana przecinkiem, ale też się nim KOŃCZYŁA.
+  <definitions>
+    <definition name="grass">
+      <sprite filename="grass.sprite" animation="" /> </definition>
+    <definition name="stone">
+      <sprite filename="stone.sprite" animation="" /> </definition>
+    <definition name="bridge">
+      <sprite filename="bridge.sprite" animation="" /> </definition>
+    <definition name="hole">
+      <sprite filename="hole.sprite" animation="big" /> </definition>
+  </definitions>
 
--- definicja, znaczenie definicji zależy od kontekstu/użycia, tzn. kreacja, która korzysta z definicji
--- wie czego się spodziewać.
-[LEVEL_NAME: "Nazwa poziomu",]
+  <actions>
+    <createObject name="tank">
+      <time s="1" ms="20" /> <!-- utwórz po 1,02 sekundy; trzeba podać
+      co najmniej jeden z atrybutów -->
+      <position x="10" y="40" />
+    </createObject>
+    <createObject name="boss">
+      <time s="5" ms="400" /> <!-- utwórz po 5,4 sekundy; trzeba podać
+      co najmniej jeden z atrybutów -->
+      <position x="100" y="20" />
+    </createObject>
+    <stopScrolling>
+      <time s="5" />
+    </stopScrolling>
+  </actions>
 
--- kreacja: tworzy obiekt przekazując parametry
-{ OBJECT:                 -- dodaj obiekt
-    NAME  = "foo",        -- o nazwie `foo`
-    X_POS = 100,          -- w pozycji (100,20)
-    Y_POS = 20,           --
-}
+  <ground>
+    <!-- przejścia wykrywane są automatycznie na podstawie
+    joinWithNext, chyba że przejście zostanie wymuszone przez useJoin,
+    wtedy joinsWithNext nie ma znaczenia -->
+    <part name="stone" repeat="1" joinWithNext="true" /> <!-- szuka
+    przejścia w sprajcie stone w animacji grass -->
+    <part name="grass" repeat="2" joinWithNext="true" /> <!-- szuka
+    przejścia w spajcie grass w animacji brigde -->
+    <part name="brigde" repeat="1" joinWithNext="false" />
+    <part name="hole" repeat="1" joinWithNext="false" />
+    <part name="stone" repeat="3" joinWithNext="true" />
+    <part name="bridge" repeat="2" joinWithNext="bezZnaczenia"
+    useJoin="extraSprite,stonebrigdeTransition" />
+  </ground>
 
+  <background>
+    <part name="bgHill" repeat="3" />
+  </background>
 
-[ GRASS: "grass.sprite", "", ]      -- animacja jest w pliku grass.sprite jako domyślna
-[ STONE: "stone.sprite", "", ]
-[ BRIDGE: "bridge.sprite", "", ]
-[ GRASS_STONE: "grass.sprite", "stone", ]        -- animacja jest w pliku grass.sprite jako animacja stone
-[ STONE_GRASS: "stone.sprite", "grass", ]
-[ GRASS_BRIDGE: "grass.sprite","brigde", ]
-[ BRIDGE_GRASS: "bridge.sprite", "grass", ]
-
--- kreacja: tworzy grunt. Kolejne elementy są tworzone zgodnie z tym co na liście.
--- można tworzyć wiele elementów tego samego rodzaju pisząć ELEMENT
-{ GROUND:
-    STONE,     STONE_GRASS,
-    GRASS 2,   GRASS_BRIGDE,
-    BRIDGE,    BRIDGE_GRASS,
-}
-
-
--- nie pamiętam znaczenia
-[ HILL: "plik z def. spritea dla zawzgorza", "", ]
-{ MIDGROUND:
-    HILL 10,
-}
-
-
-{ NO_BG_SCROLL: 5000, }  -- przestań przesuwać tło to 5s, (np. dlatego, że będzie boss)
+</level>

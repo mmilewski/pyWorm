@@ -1,93 +1,170 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import xml.dom.minidom as xmlDom
+
 '''
-Moduł parsujący zawartość pliku skryptowego opisującego poziom.
+Moduł parsujący zawartość pliku opisującego poziom.
 '''
 
-import re
-import os.path
-
-class LevelScriptParser(object):
-
-    def __init__(self, spriteName):
-#         self.__filename = os.path.join('..','gfx',spriteName,'script.sprite')
-        self.__filename = os.path.join(spriteName)
-        self.__fileContent = self.__read_file_contents()
+# DEBUG version, wypisuje dużo tekstu.
 
 
-    def __read_file_contents(self):
-        ''' Wczytuje zawartość pliku. '''
-        try:
-            f = open(self.__filename,'rU')
-            self.__fileContent = f.readlines()     # wczytaj cały plik
-            f.close()
-        except:
-            print "ERROR: nieznaleziono pliku sprite\'a lub plik jest uszkodzony:", self.__filename
-#            raise "" ???
-        return self.__fileContent
+# need help with XML? see http://www.python.org/doc/2.5.2/lib/node217.html
 
+class LevelAction:
+    ''' Klasa bazowa opizująca akcję w poziomie.'''
 
-    def __parse_definitions(self, definitions):
-        print "__parse_definitions: funkcja nie jest skończona"
-#         print "\nDEFINICJE:\n", definitions
-#         reTable,commentStr = self.__create_regex_table()
-#         reDefinition = re.compile( reTable['definitionArgs'] )
-#         for definition in definitions:
-#             m = reDefinition.match( definition )
-#             if not m: print "definition NOT MATCHED"
+    def perform(self):abstract
+        ''' Wykonuje akcję. metoda musi zostać przeciążona w klasie pochodnej.'''
+        pass
+
+    def get_next_perform_time(self):abstract
+        '''Zwraca czas kiedy powinno nastąpić następne wykonanie akcji.'''
+        pass
+
+class CreateObjectLevelAction(LevelAction):
+    ''' Klasa akcji. Odpowiada z tworzenie obiekt w poziomie.'''
+
+    def perform(self):
+        print "tworzenie obiektu"
+
+    def get_next_perform_time(self):
+        return -1;
+
+class StopScrollingLevelAction(LevelAction):
+    ''' Klasa akcji. Odpowiada za zatrzymanie przesuwania się poziomu. Np. z powodu bossa.'''
+
+    def perform(self):
+        print "zatrzymywanie scrollowania"
+
+    def get_next_perform_time(self):
+        return -1;
+
         
-        return True
+class LevelActionManager:
+    ''' Klasa menedżera odpowiada za zarządzaniem akcjami w poziomie.'''
+    def __init__(self, actions=[]):
+        ''' Inicjuje menedżera podaną listą akcji. '''
+        self.__actions=actions;
+        
+    def perform_up_to(self, msTime=-1):
+        ''' Wyzwala wszystkie akcje, które powinny zostać wykonane przed czasem msTime.
+        Jeśli msTime=-1, to zostaną uruchomione wszystkie akcje (oczywiście najpierw najstarsze.'''
+        pass
+        
 
+class LevelParser:
+    '''Klasa odczytująca poziom z pliku.'''
 
-    def __parse_creations(self, creations):
-        print "__parse_creations: funkcja nie jest skończona"
-#         print "\nKREACJE:", creations
-#         reTable,commentStr = self.__create_regex_table()
-#         reCreation = re.compile( reTable['creationArgs'] )
-#         for creation in creations:
-#             creation = creation.replace('\n','')
-#             m = reCreation.match( creation )
-#             if not m: print "creation NOT MATCHED"
-        return True
+    def __init__(self, filename):
+        self.__levelAuthor="Gal Anonim"        # domyślne wartości
+        self.__levelName="[no level name]"
 
+        print 'Loading level from `%s`...' % filename
+        data = xmlDom.parse(filename)
+        if not data.hasChildNodes():
+            print 'FAILED. Nie znalezono dzieci dla pierwszego elementu.'
+            return
 
-    def parse(self):
-        ''' Parsuje wczytane dane. '''
-        if not self.__fileContent:
-            print "WARNING: próba sparsowania pustej zawartości."
-            return False
+        #
+        # TODO
+        # sprawdzenie poprawności przez xml.sax
+        #
+        
+        lvl = data.childNodes[0]
+        if not lvl.nodeName=='level':
+            print 'Nieprawidłowy pierwszy tag, oczekiwano `level`'
+            return
 
-        reTable,commentStr = self.__create_regex_table()
+        # wczytaj dane dotyczące poziomu (nagłówek, akcje, tło, definicje,...)
+        for node in lvl.childNodes:
+            if node.nodeType==data.ELEMENT_NODE:
+                if node.localName=='header': self.__parse_header(node)
+                if node.localName=='ground': self.__parse_ground(node)
+                if node.localName=='actions': self.__parse_actions(node)
+                if node.localName=='background': self.__parse_background(node)
+                if node.localName=='definitions': self.__parse_definitions(node)
 
-        # przeczyszczenie danych (usunięcie komentarzy oraz pustych linii, strip)
-        lines = self.__fileContent
-        lines = map( lambda x: x.split(commentStr)[0], lines)   # usuń komentarze
-        lines = filter( lambda x: not re.compile(reTable['emptyLine']).match(x), lines )
-        lines = map( lambda x: x.strip(), lines)
+    def __parse_header(self, node):
+        '''Przetwarza nagłówek.'''
+        print 'parsing header'
+        # wyłuskaj autora
+        authorList = node.getElementsByTagName('author')
+        self.__levelAuthor = authorList[0].childNodes[0].data if len(authorList)>0 else self.__levelAuthor
 
-        # wyłuaskanie definicji i kreacji
-        joinedLines = '\n'.join(lines)
-        definitions = re.compile( reTable['definition'], re.DOTALL ).findall( joinedLines )
-        creations  = re.compile( reTable['creation'], re.DOTALL ).findall( joinedLines )
+        # wyłuskaj nazę poziomu
+        namesList = node.getElementsByTagName('name')
+        self.__levelName = namesList[0].childNodes[0].data if len(namesList)>0 else self.__levelName
 
-        # parsowanie definicji i kreacji oraz zwrócenie statusu operacji parsowania
-        b1 = self.__parse_definitions( definitions )
-        b2 = self.__parse_creations( creations )
-        return (b1 and b2)
+        print "\tauthor = `%s`, \n\tlevelName = `%s`" % (self.__levelAuthor, self.__levelName)
 
+    def __parse_definitions(self, node):
+        '''Przetwarza definicje.'''
+        print 'parsing definitions'
+        for defn in node.getElementsByTagName('definition'):
+            for sprite in defn.getElementsByTagName('sprite'):
+                 fname = sprite.getAttribute('filename') if sprite.hasAttribute('filename') else ''
+                 aname = sprite.getAttribute('animation') if sprite.hasAttribute('animation') else ''
+                 print "\tsprite \n\t\tfilename=`%s` \n\t\tanimation=`%s`" % (fname,aname)
+                    
 
-    def __create_regex_table(self):
-        ''' definicja lini w pliku (jako wyrażenia regularne) '''
-        commentStr = '--'       # ciąg rozpoczynający komentarz
-        rs = {
-            'emptyLine'      : '\s*$',
-            'comment'        : '\s*'+commentStr+'(.*?)$',
-            'definition'     : '(\[.*?\])',
-            'definitionArgs' : '\[\s*([\w\d\s\.]+)\s*:\s*((?:(?:"[\w\d\s\./:;\'_]*"|[\d]+)\s*,\s*)+)\s*\]', # [nazwa: argument,*]
-            'creation'       : '({.*?})',
-            'creationArgs'   : '\{\s*([\w\d\s\.]+)\s*:\s*((?:(?:"[\w\d\s\./:;\'_]*"|[\d]+)\s*,\s*)+)\s*\}', # {nazwa: argument,*}
-            }
+    def __parse_actions(self, node):
+        '''Przetwarza akcje.'''
+        print 'parsing actions'
+        for cobj in node.getElementsByTagName('createObject'):
+            print "\tcreateObject"
+            for time in cobj.getElementsByTagName('time'):
+                 s = time.getAttribute('s') if time.hasAttribute('s') else 0
+                 ms = time.getAttribute('ms') if time.hasAttribute('ms') else 0
+                 print "\t\ttime with s=%d, ms=%d" % (int(s), int(ms))
+            for pos in cobj.getElementsByTagName('position'):
+                 x = pos.getAttribute('x') if pos.hasAttribute('x') else 0
+                 y = pos.getAttribute('y') if pos.hasAttribute('y') else 0
+                 print "\t\tposition with x=%d , y=%d" % (int(x), int(y))
+        for stScroll in node.getElementsByTagName('stopScrolling'):
+            print "\tstopScrolling"
+            for time in stScroll.getElementsByTagName('time'):
+                 s = time.getAttribute('s') if time.hasAttribute('s') else 0
+                 ms = time.getAttribute('ms') if time.hasAttribute('ms') else 0
+                 print "\t\ttime with s=%d, ms=%d" % (int(s), int(ms))
 
-        return (rs, commentStr)
+    def __parse_ground(self, node):
+        '''Przetwarza dane związane z podłożem.'''
+        print 'parsing ground'
+        for part in node.getElementsByTagName('part'):
+            print "\tpart"
+            if part.hasAttribute('name'):
+                name=part.getAttribute('name')
+                print "\t\tname = %s" % name
+            if part.hasAttribute('repeat'):
+                repeat=part.getAttribute('repeat')
+                print "\t\trepeat = %s" % repeat
+            if part.hasAttribute('joinWithNext'):
+                joinWithNext=part.getAttribute('joinWithNext')
+                print "\t\tjoinWithNext = %s" % joinWithNext
+            if part.hasAttribute('useJoin'):
+                useJoin=part.getAttribute('useJoin')
+                print "\t\tuseJoin = %s" % useJoin
 
+    def __parse_background(self, node):
+        '''Przetwarza dane związane z tłem.'''
+        print 'parsing background'
+        for part in node.getElementsByTagName('part'):
+            print "\tpart"
+            if part.hasAttribute('name'):
+                name=part.getAttribute('name')
+                print "\t\tname = %s" % name
+            if part.hasAttribute('repeat'):
+                repeat=part.getAttribute('repeat')
+                print "\t\trepeat = %s" % repeat
+
+    def get_level_author(self):
+        '''Zwraca autora poziomu.'''
+        return self.__levelAuthor
+
+    def get_level_name(self):
+        '''Zwraca nazwę/tytuł poziomu.'''
+        return self.__levelName
+
+    

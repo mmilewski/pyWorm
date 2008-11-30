@@ -6,7 +6,5 @@ sys.path.append("../src")
 
 import levelParser as LP
 
-p = LP.LevelScriptParser('levelParser.input')
-b = p.parse()
-
-print '\nStatus parsowania:', 'SUKCES' if b else 'PORAŻKA'
+p = LP.LevelParser('levelParser.input')
+print "\nLevel name:",p.get_level_name(), "\nAuthor:",p.get_level_author()
