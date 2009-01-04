@@ -21,7 +21,7 @@ class App(object):
         else:
             self.__window = window.Window( width=800, height=600, fullscreen=False, vsync=vsync )
 
-        winSize = ( self.__window.width, self.__window.height )
+        self.__winSize = winSize = ( self.__window.width, self.__window.height )
 
         self.__camera = Camera( winSize )
         self.__hud    = HUD( winSize )
@@ -32,14 +32,17 @@ class App(object):
 
         # clock.set_fps_limit(50) # FIXME: ??? usunąć to ???
         
-        self.__world  = GameWorld(self)        # to musi być na końcu
+        self.__world = GameWorld(self)        # to musi być na końcu
 
+    def get_window_coords(self):
+        ''' Zwraca współrzędne czworokąta, w którym można rysować. '''
+        return self.__camera.windowCoords
 
     def register_input_observer(self, obj):
         self.__inputManager.register_observer(obj)
 
     def get_window_dim(self):
-        ''' zwraca wymiary okna (width, height) '''
+        ''' Zwraca wymiary okna (szerokość, wysokość) '''
         return (float(self.__window.width), float(self.__window.height))
         
     def main_loop(self):
@@ -49,16 +52,18 @@ class App(object):
 
             # update świata i HUDa
             dt = clock.tick()
+#             if dt>0.001:
+#                 print "FPS:", 1.0/dt
             self.__world.update( dt )
-            self.__hud.update( dt )
+#             self.__hud.update( dt )
 
             # narysuj świat
             self.__camera.set3d()
             self.__world.draw()
 
             # narysuj HUD
-            self.__camera.set2d()
-            self.__hud.draw()
+#             self.__camera.set2d()
+#             self.__hud.draw()
 
             self.__window.flip()
             

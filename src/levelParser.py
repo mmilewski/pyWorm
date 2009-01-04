@@ -12,140 +12,335 @@ Moduł parsujący zawartość pliku opisującego poziom.
 
 # need help with XML? see http://www.python.org/doc/2.5.2/lib/node217.html
 
+
+### AKCJE ###
+
 class LevelAction:
-    ''' Klasa bazowa opizująca akcję w poziomie.'''
-
-    def perform(self):abstract
-        ''' Wykonuje akcję. metoda musi zostać przeciążona w klasie pochodnej.'''
-        pass
-
-    def get_next_perform_time(self):abstract
-        '''Zwraca czas kiedy powinno nastąpić następne wykonanie akcji.'''
-        pass
-
-class CreateObjectLevelAction(LevelAction):
-    ''' Klasa akcji. Odpowiada z tworzenie obiekt w poziomie.'''
+    ''' Klasa bazowa opisująca akcję w poziomie.'''
 
     def perform(self):
-        print "tworzenie obiektu"
+        ''' Wykonuje akcję. metoda musi zostać przeciążona w klasie pochodnej.'''
+        abstract
 
-    def get_next_perform_time(self):
-        return -1;
+    def get_position_x(self):
+        ''' Zwraca współrzędną x akcji. Akcje są sortowane względem tej wartości (najpierw mniejsze).'''
+        abstract
 
 class StopScrollingLevelAction(LevelAction):
     ''' Klasa akcji. Odpowiada za zatrzymanie przesuwania się poziomu. Np. z powodu bossa.'''
 
+    def __init__(self, pos):
+        assert pos==float(pos), "argument pos musi byc skalarem typu float a nie %s" % type(pos)
+        self.__position = float(pos)
+
     def perform(self):
-        print "zatrzymywanie scrollowania"
+        print "zatrzymywanie scrollowania na pozycji", self.get_position_x()
 
-    def get_next_perform_time(self):
-        return -1;
+    def get_position_x(self):
+        return self.__position
 
-        
+
+### OBIEKTY ###
+
+class LevelObject(LevelAction):
+    ''' Klasa akcji. Odpowiada z tworzenie obiekt w poziomie.'''
+
+    def __init__(self, pos, screenPos, objectName):
+        assert isinstance(pos, tuple), "argument pos musi byc krotka a nie %s" % type(pos)
+        assert len(pos)==2, "krotka pos musi miec dokladnie dwa elementy a nie %d" % len(pos)
+        assert isinstance(screenPos, tuple), "argument screenPos musi byc krotka a nie %s" % type(screenPos)
+        assert len(screenPos)==2, "krotka screenPos musi miec dokladnie dwa elementy a nie %d" % len(screenPos)
+        self.__position = map( lambda arg:float(arg), pos )
+        self.__screenPosition = map( lambda arg:float(arg), screenPos )
+        self.__objectName = objectName
+
+    def perform(self):
+        print "tworzenie obiektu `%s` na pozycji" % self.get_name(), self.get_position()
+
+    def get_position_x(self):
+        return self.__position[0]
+
+    def get_position(self):
+        return self.__position
+
+    def get_screen_position(self):
+        return self.__screenPosition
+
+    def get_name(self):
+        return self.__objectName
+    
+class LevelObjectManager:
+    ''' Klasa menedżera obiektów odpowiada za zarządzeniem obiektami w poziomie.'''
+
+    def __init__(self, objects):
+        ''' Inicjuje menedżer podaną listą obiektów. '''
+        self.__objects = objects
+        self.__sort_objects()
+
+    def __sort_objects(self):
+        ''' Sortuje listę obiektów według kolejności występowania. '''
+        def pos_cmp(action1, action2):
+            if action1.get_position_x() < action2.get_position_x(): return -1
+            if action1.get_position_x() > action2.get_position_x(): return 1
+            return 0
+        self.__objects.sort( cmp=pos_cmp )
+
+    def get_all_objects(self):
+        ''' Zwraca posortowaną listę wszystkich obiektów.'''
+        return self.__objects
+
+    def get_objects_between_x(self, x_start, x_end):
+        ''' Zwraca posortowaną listę obiektów, których współrzędna x nalezy do zbioru (x_start,x_end). '''
+        objects = []
+        for obj in self.__objects:
+            if obj.get_position_x() >= x_end:  # jeżeli obiekt jest dalej niż x_end,...
+                break           # ... to wszystkie następne też
+            if obj.get_position_x() > x_start:
+                objects.append( obj )
+        return objects
+
+
 class LevelActionManager:
-    ''' Klasa menedżera odpowiada za zarządzaniem akcjami w poziomie.'''
-    def __init__(self, actions=[]):
-        ''' Inicjuje menedżera podaną listą akcji. '''
-        self.__actions=actions;
-        
-    def perform_up_to(self, msTime=-1):
-        ''' Wyzwala wszystkie akcje, które powinny zostać wykonane przed czasem msTime.
-        Jeśli msTime=-1, to zostaną uruchomione wszystkie akcje (oczywiście najpierw najstarsze.'''
+    ''' Klasa menedżera akcji odpowiada za zarządzaniem akcjami w poziomie.'''
+
+    def __init__(self, actions):
+        ''' Inicjuje menedżer podaną listą akcji. '''
+        self.__actions = actions
+        self.__sort_actions()
+
+    def __sort_actions(self):
+        ''' Sortuje listę akcji według kolejności występowania. '''
+        def pos_cmp(action1, action2):
+            if action1.get_position_x() < action2.get_position_x(): return -1
+            if action1.get_position_x() > action2.get_position_x(): return 1
+            return 0
+        self.__actions.sort( cmp=pos_cmp )
+
+    def perform_up_to(self, position_x=None):
+        ''' Wyzwala wszystkie akcje, których pozycja jest niewiększa niż position_x. Jeśli
+        position_x=None, to zostaną uruchomione wszystkie akcje (oczywiście najpierw najstarsze).'''
+        for action in self.__actions:
+            if position_x==None or action.get_position_x()<=position_x:
+                action.perform()
+            else:
+                break  # jeżeli akcja nie powinna być uruchomiona, to następne tym bardziej
+
+
+### DEFINICJE ###
+
+class LevelDefiniton:
+    ''' Klasa bazowa opisująca definicję w poziomie.'''
+
+    def __init__(self):
         pass
-        
+
+class SpriteLevelDefinition(LevelDefiniton):
+    ''' Klasa definicji. Opisuje definicję sprite'a w poziomie.'''
+
+    def __init__(self, filename, animName):
+        self.__filename = filename
+        self.__animationName = animName
+
+class DefinitionManager:
+    ''' Klasa menedżera definicji odpowiada za zarządzanie definicjami w poziomie.'''
+
+    def __init__(self, definitions):
+        ''' Inicjuje menedżer podaną listą definicji. '''
+        self.__definitions = definitions
+
+### PODŁOŻE ###
+
+class GroundPart:
+    ''' Klasa opisująca jeden element podłoża. '''
+
+    def __init__(self, name):
+        assert isinstance(name,basestring), "W konstruktorze należy jako nazwę podać ciąg znaków. Podano typ %s" % type(name)
+        self.__name = name
+
+    def get_name(self):
+        return self.__name
+
+
+class GroundManager:
+    ''' Klasa menedżera podłoża. Agreguje obiekty klasy GroundPart.'''
+
+    def __init__(self, grounds):
+        self.__grounds=grounds
+
+    def append_ground(self, groundPart, pos):
+        ''' Dodaje kawałek podłoża do menedżera w miejsce pos. Jeżeli pos=None, to wstawia na koniec.
+        Zwraca status powodzenia (True-dodanie powiodło się).'''
+        assert isinstance(groundPart,GroundPart), "Kawałek podłoża musi być typu GroundPart. Jest typu %s." % type(groundPart)
+        if pos==None:
+            self.__grounds.append(groundPart)
+        else:
+            print "Wstawianie podłoża w środek nie jest zaimplementowane."
+            return False
+        return True
+
+    def get_grounds(self, startPos, endPos, delete=False):
+        ''' Zwraca informacje o podłożach między startPos i endPos. Jeżeli delete=True,
+        to zostaną usunięte podłoża o pozycjach mniejszych niż startPos. '''
+        assert False, "Not implemented"
+        grounds = []
+        #
+        # TODO: przelicz, które podłoża należy zwrócić
+        #
+        # if należy_zwrócić(ground):
+        #    grounds.append(ground)
+        return grounds
+
+    def get_grounds(self):
+        return map(lambda g:g.get_name(), self.__grounds)
+
+
+### LEVEL PARSER ###
 
 class LevelParser:
-    '''Klasa odczytująca poziom z pliku.'''
+    '''Klasa odczytująca poziom z pliku. Zwraca status powodzenia.'''
 
     def __init__(self, filename):
-        self.__levelAuthor="Gal Anonim"        # domyślne wartości
+        self.__levelAuthor="[Gal Anonim]"        # domyślne wartości
         self.__levelName="[no level name]"
+        self.__errors = []
 
+        # spróbuj wczytać plik jako DOM
         print 'Loading level from `%s`...' % filename
         data = xmlDom.parse(filename)
         if not data.hasChildNodes():
             print 'FAILED. Nie znalezono dzieci dla pierwszego elementu.'
-            return
+            errors.append('FAILED. Nie znalezono dzieci dla pierwszego elementu.')
 
         #
         # TODO
         # sprawdzenie poprawności przez xml.sax
         #
-        
-        lvl = data.childNodes[0]
-        if not lvl.nodeName=='level':
+
+        # sprawdź czy plik zaczyna sie od tagu <level>
+        levels = [ node for node in data.childNodes if node.nodeName=='level' ]
+        lvl = levels[0] if len(levels)>0 else None
+        if lvl==None:
             print 'Nieprawidłowy pierwszy tag, oczekiwano `level`'
-            return
+            return errors.append('Nieprawidłowy pierwszy tag, oczekiwano `level`')
 
         # wczytaj dane dotyczące poziomu (nagłówek, akcje, tło, definicje,...)
+        self.__actionManager = None
+        self.__definitionManager = None
         for node in lvl.childNodes:
             if node.nodeType==data.ELEMENT_NODE:
-                if node.localName=='header': self.__parse_header(node)
-                if node.localName=='ground': self.__parse_ground(node)
-                if node.localName=='actions': self.__parse_actions(node)
-                if node.localName=='background': self.__parse_background(node)
-                if node.localName=='definitions': self.__parse_definitions(node)
+                if node.localName=='header':      self.__parse_header(node)
+                if node.localName=='ground':      self.__groundManager = self.__parse_ground(node)
+                if node.localName=='actions':     self.__actionManager = self.__parse_actions(node)
+                if node.localName=='objects':     self.__objectManager = self.__parse_objects(node)
+                if node.localName=='background':  self.__backgroundManager = self.__parse_background(node)
+                if node.localName=='definitions': self.__definitionManager = self.__parse_definitions(node)
+
+    def get_errors(self):
+        return self.__errors
 
     def __parse_header(self, node):
         '''Przetwarza nagłówek.'''
         print 'parsing header'
+
         # wyłuskaj autora
         authorList = node.getElementsByTagName('author')
         self.__levelAuthor = authorList[0].childNodes[0].data if len(authorList)>0 else self.__levelAuthor
 
-        # wyłuskaj nazę poziomu
+        # wyłuskaj nazwę poziomu
         namesList = node.getElementsByTagName('name')
         self.__levelName = namesList[0].childNodes[0].data if len(namesList)>0 else self.__levelName
-
         print "\tauthor = `%s`, \n\tlevelName = `%s`" % (self.__levelAuthor, self.__levelName)
 
     def __parse_definitions(self, node):
         '''Przetwarza definicje.'''
         print 'parsing definitions'
+        self.__definitions = []
+        # znajdź wszystkie definicje
         for defn in node.getElementsByTagName('definition'):
             for sprite in defn.getElementsByTagName('sprite'):
                  fname = sprite.getAttribute('filename') if sprite.hasAttribute('filename') else ''
                  aname = sprite.getAttribute('animation') if sprite.hasAttribute('animation') else ''
                  print "\tsprite \n\t\tfilename=`%s` \n\t\tanimation=`%s`" % (fname,aname)
-                    
+                 self.__definitions.append( SpriteLevelDefinition(filename=fname,animName=aname) )
+        # zwróć menedżer definicji
+        return DefinitionManager( self.__definitions )
+
 
     def __parse_actions(self, node):
         '''Przetwarza akcje.'''
         print 'parsing actions'
-        for cobj in node.getElementsByTagName('createObject'):
-            print "\tcreateObject"
-            for time in cobj.getElementsByTagName('time'):
-                 s = time.getAttribute('s') if time.hasAttribute('s') else 0
-                 ms = time.getAttribute('ms') if time.hasAttribute('ms') else 0
-                 print "\t\ttime with s=%d, ms=%d" % (int(s), int(ms))
+        self.__actions = []
+
+        # szukaj akcji: Stop Scrolling
+        for stScroll in node.getElementsByTagName('stopScrolling'):
+            for pos in stScroll.getElementsByTagName('position'):
+                 x = pos.getAttribute('x') if pos.hasAttribute('x') else 0
+            print "\tstopScrolling"
+            # dodaj nowy obiekt do listy akcji
+            self.__actions.append( StopScrollingLevelAction( pos=float(x) ) )
+        # zwróć menedżer akcji
+        return LevelActionManager( self.__actions )
+
+    def __parse_objects(self, node):
+        ''' Przetwarza tworzenie obiektów. '''
+        print 'parsing objects.'
+        objs = []
+        # szukaj obiektów
+        for cobj in node.getElementsByTagName('object'):
+            print "\tobject"
+            name = cobj.getAttribute('name') if cobj.hasAttribute('name') else "[no name]"
             for pos in cobj.getElementsByTagName('position'):
                  x = pos.getAttribute('x') if pos.hasAttribute('x') else 0
-                 y = pos.getAttribute('y') if pos.hasAttribute('y') else 0
-                 print "\t\tposition with x=%d , y=%d" % (int(x), int(y))
-        for stScroll in node.getElementsByTagName('stopScrolling'):
-            print "\tstopScrolling"
-            for time in stScroll.getElementsByTagName('time'):
-                 s = time.getAttribute('s') if time.hasAttribute('s') else 0
-                 ms = time.getAttribute('ms') if time.hasAttribute('ms') else 0
-                 print "\t\ttime with s=%d, ms=%d" % (int(s), int(ms))
+#                  y = pos.getAttribute('y') if pos.hasAttribute('y') else 0
+#                  print "\t\tposition with x=%f , y=%f" % (float(x), float(y))
+                 print "\t\tposition with x=%f" % float(x)
+            for screenPos in cobj.getElementsByTagName('screen_position'):
+                 sx = screenPos.getAttribute('x') if screenPos.hasAttribute('x') else 0
+                 sy = screenPos.getAttribute('y') if screenPos.hasAttribute('y') else 0
+                 print "\t\tscreen position with x=%f , y=%f" % (float(sx), float(sy))
+            # dodaj nowy obiekt do listy akcji
+            y = 0        # atrybut y jest zbędny
+            position = (float(x),float(y))
+            screenPosition = (float(sx),float(sy))
+            objs.append( LevelObject( pos=position, screenPos=screenPosition, objectName=name ) )
+        return LevelObjectManager( objs )
 
     def __parse_ground(self, node):
         '''Przetwarza dane związane z podłożem.'''
         print 'parsing ground'
+        self.__grounds = []
+        prevPart = None            # poprzedni element - potrzebne aby dodać połączenie
+        prevJoin = False           # czy poprzedni element wymaga łączenia?
         for part in node.getElementsByTagName('part'):
             print "\tpart"
+            name = repeat = joinWithNext = useJoin = None
             if part.hasAttribute('name'):
-                name=part.getAttribute('name')
+                name = part.getAttribute('name')
                 print "\t\tname = %s" % name
             if part.hasAttribute('repeat'):
-                repeat=part.getAttribute('repeat')
+                repeat = int(part.getAttribute('repeat'))
                 print "\t\trepeat = %s" % repeat
             if part.hasAttribute('joinWithNext'):
-                joinWithNext=part.getAttribute('joinWithNext')
+                joinWithNext = True if part.getAttribute('joinWithNext')=='true' else False
                 print "\t\tjoinWithNext = %s" % joinWithNext
             if part.hasAttribute('useJoin'):
-                useJoin=part.getAttribute('useJoin')
+                useJoin = True if part.getAttribute('useJoin')=='true' else False
                 print "\t\tuseJoin = %s" % useJoin
+            # sprawdź czy wszystkie atrybuty zostały wczytane
+            assert name!=None, "brak atrybutu name"
+            assert repeat!=None, "brak atrybutu repeat"
+            assert joinWithNext!=None, "brak atrybutu joinWithNext"
+            # dodaj połączenie między częściami, jeśli konieczne
+            part = GroundPart( name=name )
+            if prevPart!=None and prevJoin and (prevPart.get_name() != part.get_name()):
+                self.__grounds.append( GroundPart(prevPart.get_name() + ',' + part.get_name()) )
+            # dodaj element podłoża tyle razy ile producent każe ;)
+            for i in range(repeat):
+                self.__grounds.append( part )
+            prevPart = part
+            prevJoin = joinWithNext
+        # zwróć menedżer podłoża
+        return GroundManager( self.__grounds )
 
     def __parse_background(self, node):
         '''Przetwarza dane związane z tłem.'''
@@ -159,6 +354,7 @@ class LevelParser:
                 repeat=part.getAttribute('repeat')
                 print "\t\trepeat = %s" % repeat
 
+
     def get_level_author(self):
         '''Zwraca autora poziomu.'''
         return self.__levelAuthor
@@ -167,4 +363,23 @@ class LevelParser:
         '''Zwraca nazwę/tytuł poziomu.'''
         return self.__levelName
 
-    
+
+    def get_action_manager(self):
+        '''Zwraca menedżer akcji w poziomie.'''
+        return self.__actionManager
+
+    def get_object_manager(self):
+        '''Zwraca menedżer obiektów w poziomie.'''
+        return self.__objectManager
+
+    def get_definition_manager(self):
+        '''Zwraca menedżer definicji w poziomie.'''
+        return self.__definitionManager
+
+    def get_ground_manager(self):
+        '''Zwraca menedżer definicji w poziomie.'''
+        return self.__groundManager
+
+    def get_background_manager(self):
+        '''Zwraca menedżer definicji w poziomie.'''
+        return self.__backgroundManager

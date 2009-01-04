@@ -21,6 +21,10 @@ from playerHeli import PlayerHeliAIStrategy, PlayerHeliCreator
 # sprite'y
 from spriteStrategy import SpriteScriptStrategy
 from spriteScriptParser import SpriteScriptParser
+from pyglet import image
+
+# dodatkowe
+from math import sin, cos
 
 
 class GameWorld(object):
@@ -36,34 +40,44 @@ class GameWorld(object):
         self.__objectFactory    = self.__create_object_factory(self.__spriteManager) # fabryka obiektów
         self.__levelManager     = LevelManager(self.__objectFactory)        # menadżer poziomów
         
-        self.__levelManager.load_level("test_level")
+        self.__levelManager.load_level("demo_level")
 
-        # Dodaj obiekt helikoptera i jeepa do gry
-        self.add_object(self.__create_heli())
-
-
-        
+        # utwórz teksturę, do której będzie renderowany obraz
         #
-        # FIXME: Do usunięcia (powinno być obsługiwane przez zarządcę poziomu
-        # 
-        obj = self.__objectFactory.create_object( 'helicopter1' )
-        obj.position = (0.7, 0.1)
-        self.add_object(obj)
-
-        obj = self.__objectFactory.create_object( 'helicopter1' )
-        obj.position = (0.7, 0.3)
-        self.add_object(obj)
-
-        obj = self.__objectFactory.create_object( 'helicopter1' )
-        obj.position = (0.7, 0.5)
-        self.add_object(obj)
-
-        obj = self.__objectFactory.create_object( 'helicopter1' )
-        obj.position = (0.45, 0.3)
-        self.add_object(obj)
-
-
+        # FIXME: rozmiar tekstury powinna definiować stała
+        #
+        img = image.create( 512, 512 )
+        self.__renderTexture = img.get_texture()
         
+        # Dodaj obiekt helikoptera i jeepa do gry
+        #
+        # FIXME: jeep?
+        #
+        self.add_object( self.__create_heli() )
+
+
+
+#         #
+#         # FIXME: Do usunięcia (powinno być obsługiwane przez zarządcę poziomu
+#         # 
+#         obj = self.__objectFactory.create_object( 'helicopter1' )
+#         obj.position = (0.7, 0.1)
+#         self.add_object(obj)
+
+#         obj = self.__objectFactory.create_object( 'helicopter1' )
+#         obj.position = (0.7, 0.3)
+#         self.add_object(obj)
+
+#         obj = self.__objectFactory.create_object( 'helicopter1' )
+#         obj.position = (0.7, 0.5)
+#         self.add_object(obj)
+
+#         obj = self.__objectFactory.create_object( 'helicopter1' )
+#         obj.position = (0.45, 0.3)
+#         self.add_object(obj)
+
+        self.__swingAngle = 0.0   # kołysanie się wyrenderowanej tekstury
+
         
     def add_object(self, gameobject):
         ''' Dodaje obiekt do świata. Sprawdza typ dodawanego obiektu. '''
@@ -89,6 +103,12 @@ class GameWorld(object):
            
     def update(self, dt):
         ''' Aktualizuje obiekty ze świata. '''
+        
+        # progres animacji
+        self.__swingAngle += dt*100
+
+        # aktualizacja menedżera poziomu (np. stworzenie nowych jednostek)
+        self.__levelManager.update( dt, self )
 
         # odfiltruj obiekty, które są zniszczone
         for o in self.__objects:
@@ -103,53 +123,97 @@ class GameWorld(object):
         for obj in self.__objects:
             obj.update( dt )
 
-            
-    def draw(self):
-        ''' Rysuje wszystkie obiekty w świecie. '''
-        glClearColor( 0.5, 0.5, 0.5, 0 )
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
 
+    def __draw_object( self, obj ):
+        ''' Rysuje obiekt przekazany jako argument. '''
+        glPushMatrix()
+
+        # przygotuj mieszanie kolorów
         glEnable( GL_BLEND )
         glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
-        
-        for obj in self.__objects:
-            spriteName  = obj.spriteName
-            animName    = obj.get_current_animation_name()
-            frameNum    = obj.get_current_frame_num()
-            frame     = self.__spriteManager.get_frame( spriteName, animName, frameNum )
-            
-            (tc,vs)   = self.__compute_tex_vertex_coords( obj, frame )
-            textureId = frame.textureId
-            
-            glPushMatrix()
 
-            # narysuj tło pod sprite'em (do celów testowych)
-            if( obj.display_pad() ):
-                glDisable( GL_TEXTURE_2D )
-                glColor3f( .3, .3, .4 )     # ew. kolor może być skądś pobierany
-                glBegin( GL_QUADS )
-                for v in vs:
-                    glVertex2f( *v )
-                glEnd()
+        # zbierz informacje o reprezentacji obiektu
+        spriteName  = obj.spriteName
+        animName    = obj.get_current_animation_name()
+        frameNum    = obj.get_current_frame_num()
+        frame     = self.__spriteManager.get_frame( spriteName, animName, frameNum )
+        (tc,vs)   = self.__compute_tex_vertex_coords( obj, frame )
+        textureId = frame.textureId
 
-            # wyświetlenie czworokąta/sprite'a
-            glEnable( GL_TEXTURE_2D )
-            glBindTexture( GL_TEXTURE_2D, textureId )
-            
+        # narysuj tło pod sprite'em (do celów testowych)
+        if( obj.display_pad() ):
+            glDisable( GL_TEXTURE_2D )
+            glColor3f( .3, .3, .4 )     # ew. kolor może być skądś pobierany
             glBegin( GL_QUADS )
-            for t,v in zip(tc,vs):
-                glTexCoord2f( *t )
+            for v in vs:
                 glVertex2f( *v )
             glEnd()
 
-            glDisable( GL_TEXTURE_2D )
-            glPopMatrix()
+        # wyświetlenie czworokąta/sprite'a
+        glEnable( GL_TEXTURE_2D )
+        assert glIsTexture( textureId ), "Próba narysowania czegoś, co nie jest teksturą, jest %s" % type(textureId)
+        glBindTexture( GL_TEXTURE_2D, textureId )
+        glBegin( GL_QUADS )
+        for t,v in zip(tc,vs):
+            glTexCoord2f( *t )
+            glVertex2f( *v )
+        glEnd()
+        glDisable( GL_TEXTURE_2D )
+
+        glPopMatrix()
+
+
+    def draw(self):
+        ''' Rysuje wszystkie obiekty w świecie. '''
+        glClearColor( 0.5, 0.5, 0.5, 0.5 )
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
+        glMatrixMode( GL_MODELVIEW )
+        glLoadIdentity()
+
+        # zmień viewport, będziemy renderować do tekstury
+        #
+        # FIXME: rozmiar tekstury powinna definiować jakaś stała
+        #
+        glViewport( 0, 0, 512, 512 )
+
+        # narysuj wszystkie obiekty
+        for obj in self.__objects:
+            self.__draw_object( obj )
+
+        # zapisz bufor do tekstury
+        assert glIsTexture( self.__renderTexture.id ),"Próba narysowania czegoś, co nie jest teksturą, %s" % type(self.__renderTexture.id)
+        glBindTexture( GL_TEXTURE_2D, self.__renderTexture.id )
+        glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, 512, 512, 0)
+#         glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, 512, 512)
+
+        # przywróć viewport, wyczyść bufor i narysuj czworokąt z zapisaną teksturą
+        winSize = map( lambda x:int(x), self.__theApp.get_window_dim() )
+        glViewport( 0, 0, winSize[0], winSize[1] )
+        glClearColor( 0.5, 0.5, 0.5, 0.5 )
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glLoadIdentity()
+        glEnable( GL_TEXTURE_2D )
+        glColor3f( .5, 1, 1 )
+
+        # zrób galarete :D
+        glScalef( .9+sin(self.__swingAngle)/100, .9+cos(self.__swingAngle)/80, 1 )
+
+        coords = self.__theApp.get_window_coords()   # czworokąt zajmujący cały ekran
+        x0,x1,y0,y1 = coords[0], coords[1], coords[2], coords[3]
+        tc = [ (  0,  0), (  1,  0), (  1,  1), (  0,  1) ]
+        vs = [ ( x0, y0), ( x1, y0), ( x1, y1), ( x0, y1) ]
+        glBegin( GL_QUADS )
+        for t,v in zip(tc,vs):
+            glTexCoord2f( *t )
+            glVertex2f( *v )
+        glEnd()
+
+        # zrzuć wszystko
+        glFlush()
 
 
     def __compute_tex_vertex_coords(self, obj, frame):
-        ''' zwraca parę (współrzędne tekstury, współrzędne wierzchołka) dla obiektu `obj` '''
+        ''' Zwraca parę (współrzędne tekstury, współrzędne wierzchołka) dla obiektu `obj` '''
 
         tex_left, tex_bottom, tex_right, tex_top = frame.rect
         winWidth, winHeight = self.__theApp.get_window_dim()
@@ -180,6 +244,7 @@ class GameWorld(object):
 
 
     def __create_heli(self):
+        ''' Tworzy helikopter gracza. '''
         creator = PlayerHeliCreator( self.__theApp, self, self.__spriteManager, self.__objectFactory )
         heli = creator.create( 'heli' )
         heli.position = (0.1, 0.5)

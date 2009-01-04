@@ -14,7 +14,7 @@ class Camera(object):
         # +------------(1,ratio)
         # |                    |
         # (0,0)----------------+
-        self.__windowCoords = (0, 1, 0, ratio)
+        self.__windowCoords = (0, 1, 0, ratio)   # xmin,xmax,ymin,ymax
 
         # płaszczyzny obcinania
         self.__znearFar = (-1, 100)
