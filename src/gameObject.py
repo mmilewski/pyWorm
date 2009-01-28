@@ -6,6 +6,7 @@ from copy import deepcopy
 from spriteStrategy import SpriteScriptStrategy
 from spriteScriptParser import SpriteScriptParser
 
+
 class GameObjectCreator(object):
     ''' Enkapsulacja algorytmu tworzenia obiektu. Dla każdego istotnie
     różnego obiektu należy utworzyć jedną podklasę tej klasy,
@@ -22,9 +23,9 @@ class GameObjectCreator(object):
         '''
         self.spriteManager  = spriteManager # zarządca sprite'ów
         self.spriteName     = None      # nazwa ładowanego sprite'a
-        
+
         self.parser         = None      # parser plików konfiguracyjnych
-        self.spriteStrategy = None      # strategia zarządzanai spritem
+        self.spriteStrategy = None      # strategia zarządzania spritem
         self.aiStrategy     = None      # strategia ai nowego obiektu
 
         self.object         = None      # wynik wypiekania obiektu
@@ -35,6 +36,13 @@ class GameObjectCreator(object):
         objName      : Pod jaką nazwą zarejestrować obiekt w fabryce obiektów
         spriteName   : Jakiego sprite'a załadować
         '''
+
+        #
+        # FIXME:
+        #
+        # opis metody sugeruje jeszcze argument objName. Coś go nie widać :-/
+        #
+
         self.spriteName = spriteName
         
         self.parser = SpriteScriptParser( self.spriteName )
@@ -102,7 +110,7 @@ class GameObject(object):
     def display_pad(self):
         ''' Zwraca informację o tym, czy podkładka ma być wyświetlona,
         tzn. czy pod sprite'm ma być wyświetlony jego aabb. Domyślnie tak.'''
-        return True
+        return False
         
     def __set_vel(self, vel): self.__vel = vel
     velocity = property(lambda self: self.__vel,

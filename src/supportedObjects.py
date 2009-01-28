@@ -9,9 +9,10 @@
 #
 
 import sys
-sys.path.append("../")
+# sys.path.append("../")
 
 from helicopter1 import Helicopter1Creator
+from hill import HillCreator
 
 
 def add_supported_objects_to_factory(objFactory, spriteManager):
@@ -23,3 +24,6 @@ def add_supported_objects_to_factory(objFactory, spriteManager):
 
     # Dodawanie obiektów
     add_object(objFactory, 'helicopter1', Helicopter1Creator(spriteManager))
+
+    # sceneria
+    add_object( objFactory, 'hill', HillCreator(spriteManager))

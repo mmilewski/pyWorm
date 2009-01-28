@@ -28,7 +28,6 @@ class Camera(object):
         glLoadIdentity()
         glOrtho( *self.__windowCoords + self.__znearFar )
 
-
     def set2d(self):
         ''' Ustawia projektcję na dwuwymiarową. '''
         glMatrixMode(GL_PROJECTION)

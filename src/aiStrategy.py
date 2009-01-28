@@ -32,3 +32,15 @@ class DumbAIStrategy(AIStrategy):
     def update(self, dt):
         pass
 
+
+from math import cos
+
+class MoveAIStrategy(AIStrategy):
+    ''' Przykładowa strategia powodująca ruch obiektu.'''
+    def __init__(self, gameObject, spriteStrategy):
+        AIStrategy.__init__(self, gameObject, spriteStrategy)
+        self.__timer = 0         # licznik czasu, który upłynął
+                            
+    def update(self, dt):
+        self.__timer+=dt
+        self.gameObject.velocity=(cos(self.__timer+1.5)/7,cos(self.__timer)/10.0)

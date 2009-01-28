@@ -194,6 +194,76 @@ class GroundManager:
         return map(lambda g:g.get_name(), self.__grounds)
 
 
+class BackgroundManager:
+    ''' Klasa menedżera tła.'''
+    def __init__(self):
+        self.__filenames = []
+
+    def append_filename(self,filename):
+        self.__filenames.append(filename)
+
+    def get_filenames(self):
+        return self.__filenames
+
+
+### ELEMENTY PEJZAŻU ###
+class SceObject(object):
+    ''' Klasa akcji. Odpowiada z tworzenie obiekt w poziomie.'''
+
+    def __init__(self, pos, screenPos, objectName):
+        assert isinstance(pos, tuple), "argument pos musi byc krotka a nie %s" % type(pos)
+        assert len(pos)==2, "krotka pos musi miec dokladnie dwa elementy a nie %d" % len(pos)
+        assert isinstance(screenPos, tuple), "argument screenPos musi byc krotka a nie %s" % type(screenPos)
+        assert len(screenPos)==2, "krotka screenPos musi miec dokladnie dwa elementy a nie %d" % len(screenPos)
+        self.__position = map( lambda arg:float(arg), pos )
+        self.__screenPosition = map( lambda arg:float(arg), screenPos )
+        self.__objectName = objectName
+
+    def perform(self):
+        print "tworzenie elementu pejzażu `%s` na pozycji" % self.get_name(), self.get_position()
+
+    def get_position_x(self):
+        return self.__position[0]
+
+    def get_position(self):
+        return self.__position
+
+    def get_screen_position(self):
+        return self.__screenPosition
+
+    def get_name(self):
+        return self.__objectName
+
+class SceObjectManager(object):
+    ''' Klasa menedżera obiektów odpowiada za zarządzeniem obiektami w poziomie.'''
+
+    def __init__(self, objects):
+        ''' Inicjuje menedżer podaną listą obiektów. '''
+        self.__objects = objects
+        self.__sort_objects()
+
+    def __sort_objects(self):
+        ''' Sortuje listę obiektów według kolejności występowania. '''
+        def pos_cmp(action1, action2):
+            if action1.get_position_x() < action2.get_position_x(): return -1
+            if action1.get_position_x() > action2.get_position_x(): return 1
+            return 0
+        self.__objects.sort( cmp=pos_cmp )
+
+    def get_all_objects(self):
+        ''' Zwraca posortowaną listę wszystkich obiektów.'''
+        return self.__objects
+
+    def get_objects_between_x(self, x_start, x_end):
+        ''' Zwraca posortowaną listę obiektów, których współrzędna x nalezy do zbioru (x_start,x_end). '''
+        objects = []
+        for obj in self.__objects:
+            if obj.get_position_x() >= x_end:  # jeżeli obiekt jest dalej niż x_end,...
+                break           # ... to wszystkie następne też
+            if obj.get_position_x() > x_start:
+                objects.append( obj )
+        return objects
+
 ### LEVEL PARSER ###
 
 class LevelParser:
@@ -232,6 +302,7 @@ class LevelParser:
                 if node.localName=='ground':      self.__groundManager = self.__parse_ground(node)
                 if node.localName=='actions':     self.__actionManager = self.__parse_actions(node)
                 if node.localName=='objects':     self.__objectManager = self.__parse_objects(node)
+                if node.localName=='scenery':     self.__sceManager = self.__parse_scenery(node)
                 if node.localName=='background':  self.__backgroundManager = self.__parse_background(node)
                 if node.localName=='definitions': self.__definitionManager = self.__parse_definitions(node)
 
@@ -307,6 +378,8 @@ class LevelParser:
 
     def __parse_ground(self, node):
         '''Przetwarza dane związane z podłożem.'''
+        return None
+
         print 'parsing ground'
         self.__grounds = []
         prevPart = None            # poprzedni element - potrzebne aby dodać połączenie
@@ -345,14 +418,44 @@ class LevelParser:
     def __parse_background(self, node):
         '''Przetwarza dane związane z tłem.'''
         print 'parsing background'
+        bm = BackgroundManager()
         for part in node.getElementsByTagName('part'):
             print "\tpart"
             if part.hasAttribute('name'):
                 name=part.getAttribute('name')
                 print "\t\tname = %s" % name
+            if part.hasAttribute('filename'):
+                filename=part.getAttribute('filename')
+                print "\t\tfilename = %s" % filename
+                bm.append_filename(filename)
             if part.hasAttribute('repeat'):
                 repeat=part.getAttribute('repeat')
                 print "\t\trepeat = %s" % repeat
+        return bm
+
+
+    def __parse_scenery(self, node):
+        '''Przetwarza dane związane z pejzażem.'''
+        print 'parsing scenery'
+        objs = []
+        for cobj in node.getElementsByTagName('part'):
+            print "\tpart"
+            name = cobj.getAttribute('name') if cobj.hasAttribute('name') else "[no name]"
+            for pos in cobj.getElementsByTagName('position'):
+                 x = pos.getAttribute('x') if pos.hasAttribute('x') else 0
+#                  y = pos.getAttribute('y') if pos.hasAttribute('y') else 0
+#                  print "\t\tposition with x=%f , y=%f" % (float(x), float(y))
+                 print "\t\tposition with x=%f" % float(x)
+            for screenPos in cobj.getElementsByTagName('screen_position'):
+                 sx = screenPos.getAttribute('x') if screenPos.hasAttribute('x') else 0
+                 sy = screenPos.getAttribute('y') if screenPos.hasAttribute('y') else 0
+                 print "\t\tscreen position with x=%f , y=%f" % (float(sx), float(sy))
+            # dodaj nowy obiekt do listy akcji
+            y = 0        # atrybut y jest zbędny
+            position = (float(x),float(y))
+            screenPosition = (float(sx),float(sy))
+            objs.append( SceObject( pos=position, screenPos=screenPosition, objectName=name ) )
+        return SceObjectManager( objs )
 
 
     def get_level_author(self):
@@ -379,6 +482,10 @@ class LevelParser:
     def get_ground_manager(self):
         '''Zwraca menedżer definicji w poziomie.'''
         return self.__groundManager
+
+    def get_sce_manager(self):
+        '''Zwraca menedżer pejzazy w poziomie.'''
+        return self.__sceManager
 
     def get_background_manager(self):
         '''Zwraca menedżer definicji w poziomie.'''

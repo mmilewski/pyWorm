@@ -10,6 +10,7 @@ sys.path.append("game_objects/") # konieczne do korzystania z game_objectów
 from collisionManager import CollisionManager
 from levelManager import LevelManager
 from spriteManager import SpriteManager
+from backgroundManager import BackgroundManager
 
 # obiekty gry
 from supportedObjects import add_supported_objects_to_factory
@@ -23,32 +24,33 @@ from spriteStrategy import SpriteScriptStrategy
 from spriteScriptParser import SpriteScriptParser
 from pyglet import image
 
-# dodatkowe
-from math import sin, cos
+# pomocnicze
+from render_toolkit import draw_textured_quad, compute_tex_vertex_coords
+import const
 
 
 class GameWorld(object):
 
     def __init__(self, theApp):
-        ''' theApp: refernecja do obiektu aplikacji. Potrzebne przy dodawaniu obiektu nasłuchującego wejścia '''
+        ''' theApp: refernecja do obiektu aplikacji. Potrzebne przy dodawaniu obiektu nasłuchującego wejścia. '''
 
         self.__theApp = theApp                                              # obiekt zarządzający aplikacją
         self.__objects = []                                                 # lista obiektów w świecie
-        
-        self.__spriteManager    = SpriteManager()                           # menadżer sprite'ów
-        self.__collisionManager = CollisionManager(self.__spriteManager)    # menadżer kolizji
-        self.__objectFactory    = self.__create_object_factory(self.__spriteManager) # fabryka obiektów
-        self.__levelManager     = LevelManager(self.__objectFactory)        # menadżer poziomów
-        
-        self.__levelManager.load_level("demo_level")
 
-        # utwórz teksturę, do której będzie renderowany obraz
-        #
-        # FIXME: rozmiar tekstury powinna definiować stała
-        #
-        img = image.create( 512, 512 )
-        self.__renderTexture = img.get_texture()
-        
+        self.__spriteManager     = SpriteManager()                           # menadżer sprite'ów
+        self.__collisionManager  = CollisionManager(self.__spriteManager)    # menadżer kolizji
+        self.__objectFactory     = self.__create_object_factory(self.__spriteManager) # fabryka obiektów
+        self.__levelManager      = LevelManager(self.__objectFactory)        # menadżer poziomów
+        self.__backgroundManager = BackgroundManager( levelManager = self.__levelManager )
+        self.__backgroundManager.set_window_coords( self.__theApp.get_window_coords() )
+        self.__backgroundManager.set_window_dim( self.__theApp.get_window_dim() )
+
+        if not self.__levelManager.load_level("demo_level"):
+            assert True, "Tworzenie świata nie powiodło się. Nie można wczytać poziomu."
+
+        const.renderTextureSize = (512,512)                # rozmiary tekstury, do której będziemy renderować
+        self.__renderTexture = image.create( *const.renderTextureSize ).get_texture()
+
         # Dodaj obiekt helikoptera i jeepa do gry
         #
         # FIXME: jeep?
@@ -56,56 +58,33 @@ class GameWorld(object):
         self.add_object( self.__create_heli() )
 
 
-
-#         #
-#         # FIXME: Do usunięcia (powinno być obsługiwane przez zarządcę poziomu
-#         # 
-#         obj = self.__objectFactory.create_object( 'helicopter1' )
-#         obj.position = (0.7, 0.1)
-#         self.add_object(obj)
-
-#         obj = self.__objectFactory.create_object( 'helicopter1' )
-#         obj.position = (0.7, 0.3)
-#         self.add_object(obj)
-
-#         obj = self.__objectFactory.create_object( 'helicopter1' )
-#         obj.position = (0.7, 0.5)
-#         self.add_object(obj)
-
-#         obj = self.__objectFactory.create_object( 'helicopter1' )
-#         obj.position = (0.45, 0.3)
-#         self.add_object(obj)
-
-        self.__swingAngle = 0.0   # kołysanie się wyrenderowanej tekstury
-
-        
-    def add_object(self, gameobject):
+    def add_object(self, gameObject):
         ''' Dodaje obiekt do świata. Sprawdza typ dodawanego obiektu. '''
-        try: isinstance(gameobject, GameObject),
+        try: isinstance(gameObject, GameObject),
         except TypeError, msg: print msg, "Dodawany obiekt nie jest typu GameObject."
 
-        self.__objects.append( gameobject )
-        self.__collisionManager.add_object( gameobject )
+        self.__objects.append( gameObject )
+        self.__collisionManager.add_object( gameObject )
 
 
-    def remove_object(self, gameobject):
+    def remove_object(self, gameObject):
         ''' Usuwa wszystkie wystąpienia obiektu w świecie. '''
-        for i in range(self.__objects.count(gameobject)):
-            self.__objects.remove( gameobject )
-            self.collisionManager.remove_object( gameobject )
-
+        for i in range(self.__objects.count(gameObject)):
+            self.__objects.remove( gameObject )
+            self.collisionManager.remove_object( gameObject )
 
     def create_object(self, objName):
-        ''' Tworzy obiekt o zadanej nazwie korzystając z fabryki
-        obiektów.  '''
+        ''' Tworzy obiekt o zadanej nazwie korzystając z fabryki obiektów. '''
         return self.__objectFactory.create_object( objName )
-        
-           
+
+
+    def get_background_manager(self):
+        assert self.__backgroundManager, "Obiekt tła nie istnieje."
+        return self.__backgroundManager
+
+
     def update(self, dt):
         ''' Aktualizuje obiekty ze świata. '''
-        
-        # progres animacji
-        self.__swingAngle += dt*100
 
         # aktualizacja menedżera poziomu (np. stworzenie nowych jednostek)
         self.__levelManager.update( dt, self )
@@ -123,6 +102,9 @@ class GameWorld(object):
         for obj in self.__objects:
             obj.update( dt )
 
+        # aktualizuj tło, pejzaż, podłoże,...
+        self.get_background_manager().update( dt )
+
 
     def __draw_object( self, obj ):
         ''' Rysuje obiekt przekazany jako argument. '''
@@ -137,7 +119,8 @@ class GameWorld(object):
         animName    = obj.get_current_animation_name()
         frameNum    = obj.get_current_frame_num()
         frame     = self.__spriteManager.get_frame( spriteName, animName, frameNum )
-        (tc,vs)   = self.__compute_tex_vertex_coords( obj, frame )
+        (ww,wh)   = self.__theApp.get_window_dim()
+        (tc,vs)   = compute_tex_vertex_coords( obj, frame, ww, wh )
         textureId = frame.textureId
 
         # narysuj tło pod sprite'em (do celów testowych)
@@ -149,42 +132,37 @@ class GameWorld(object):
                 glVertex2f( *v )
             glEnd()
 
-        # wyświetlenie czworokąta/sprite'a
-        glEnable( GL_TEXTURE_2D )
-        assert glIsTexture( textureId ), "Próba narysowania czegoś, co nie jest teksturą, jest %s" % type(textureId)
-        glBindTexture( GL_TEXTURE_2D, textureId )
-        glBegin( GL_QUADS )
-        for t,v in zip(tc,vs):
-            glTexCoord2f( *t )
-            glVertex2f( *v )
-        glEnd()
-        glDisable( GL_TEXTURE_2D )
+        # narysuj sprite'a
+        draw_textured_quad( tc, vs, textureId )
+        glColor3f( 1, 1, 1 )
 
         glPopMatrix()
 
 
     def draw(self):
         ''' Rysuje wszystkie obiekty w świecie. '''
-        glClearColor( 0.5, 0.5, 0.5, 0.5 )
+
+        glClearColor( 0.4, 0.4, 0.4, 0.5 )
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
         glMatrixMode( GL_MODELVIEW )
         glLoadIdentity()
 
         # zmień viewport, będziemy renderować do tekstury
-        #
-        # FIXME: rozmiar tekstury powinna definiować jakaś stała
-        #
-        glViewport( 0, 0, 512, 512 )
+        tw,th = const.renderTextureSize
+        glViewport( 0, 0, tw, th )
+
+        # narysuj tło
+        self.get_background_manager().draw_background()
 
         # narysuj wszystkie obiekty
         for obj in self.__objects:
             self.__draw_object( obj )
 
         # zapisz bufor do tekstury
-        assert glIsTexture( self.__renderTexture.id ),"Próba narysowania czegoś, co nie jest teksturą, %s" % type(self.__renderTexture.id)
+        assert glIsTexture( self.__renderTexture.id ), "Próba narysowania czegoś, co nie jest teksturą, %s" % type(self.__renderTexture.id)
         glBindTexture( GL_TEXTURE_2D, self.__renderTexture.id )
-        glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, 512, 512, 0)
-#         glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, 512, 512)
+        glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, tw, th, 0 )
+#         glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, tw, th )
 
         # przywróć viewport, wyczyść bufor i narysuj czworokąt z zapisaną teksturą
         winSize = map( lambda x:int(x), self.__theApp.get_window_dim() )
@@ -195,49 +173,29 @@ class GameWorld(object):
         glEnable( GL_TEXTURE_2D )
         glColor3f( .5, 1, 1 )
 
-        # zrób galarete :D
-        glScalef( .9+sin(self.__swingAngle)/100, .9+cos(self.__swingAngle)/80, 1 )
-
-        coords = self.__theApp.get_window_coords()   # czworokąt zajmujący cały ekran
+        # renderuj czworokąt na cały ekran
+        coords = self.__theApp.get_window_coords()
         x0,x1,y0,y1 = coords[0], coords[1], coords[2], coords[3]
         tc = [ (  0,  0), (  1,  0), (  1,  1), (  0,  1) ]
         vs = [ ( x0, y0), ( x1, y0), ( x1, y1), ( x0, y1) ]
-        glBegin( GL_QUADS )
-        for t,v in zip(tc,vs):
-            glTexCoord2f( *t )
-            glVertex2f( *v )
-        glEnd()
+        draw_textured_quad( tc, vs, self.__renderTexture.id )
 
         # zrzuć wszystko
         glFlush()
 
 
-    def __compute_tex_vertex_coords(self, obj, frame):
-        ''' Zwraca parę (współrzędne tekstury, współrzędne wierzchołka) dla obiektu `obj` '''
-
-        tex_left, tex_bottom, tex_right, tex_top = frame.rect
-        winWidth, winHeight = self.__theApp.get_window_dim()
-        
-        vertex_left, vertex_bottom = obj.position
-        vertex_right = vertex_left + frame.width / winWidth
-        vertex_top = vertex_bottom + frame.height / winHeight
-        
-        tc = ( (tex_left, tex_bottom), (tex_right, tex_bottom), (tex_right, tex_top), (tex_left, tex_top) )
-        vs = ( (vertex_left, vertex_bottom), (vertex_right, vertex_bottom), (vertex_right, vertex_top), (vertex_left, vertex_top) )
-
-        return (tc,vs)
-    
-
     def check_collisions(self):
         ''' Pobiera pary kolidujących obiektów i nakazuje obsługę któremuś z nich. '''
+
         collPairs = self.__collisionManager.get_colliding_objects()
         for a,b in collPairs:
             if a != b:
                 a.collide(b)
 
-                
+
     def __create_object_factory(self, spriteManager):
-        ''' Tworzy instancję fabryki obiektów '''
+        ''' Tworzy instancję fabryki obiektów. '''
+
         objFactory = GameObjectFactory()
         add_supported_objects_to_factory(objFactory, spriteManager)
         return objFactory
@@ -245,6 +203,7 @@ class GameWorld(object):
 
     def __create_heli(self):
         ''' Tworzy helikopter gracza. '''
+
         creator = PlayerHeliCreator( self.__theApp, self, self.__spriteManager, self.__objectFactory )
         heli = creator.create( 'heli' )
         heli.position = (0.1, 0.5)

@@ -32,8 +32,11 @@ class App(object):
 
         # clock.set_fps_limit(50) # FIXME: ??? usunąć to ???
         
+        glDepthFunc( GL_LEQUAL )
+        glEnable( GL_DEPTH_TEST )
         self.__world = GameWorld(self)        # to musi być na końcu
 
+        
     def get_window_coords(self):
         ''' Zwraca współrzędne czworokąta, w którym można rysować. '''
         return self.__camera.windowCoords

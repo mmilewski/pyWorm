@@ -15,20 +15,26 @@
       <sprite filename="bridge.sprite" animation="" /> </definition>
     <definition name="hole">
       <sprite filename="hole.sprite" animation="big" /> </definition>
+    <definition name="sHill">
+      <sprite filename="sHill.sprite" animation="" /> </definition>
   </definitions>
 
   <objects>
+<!--     <object name="helicopter1"> -->
+<!--       <position x="210" y="40" /> -->
+<!--       <screen_position x=".7" y=".1" /> -->
+<!--     </object> -->
+<!--     <object name="helicopter1"> -->
+<!--       <position x="130" y="60" /> -->
+<!--       <screen_position x=".7" y=".3" /> -->
+<!--     </object> -->
+<!--     <object name="helicopter1"> -->
+<!--       <position x="160" y="160" /> -->
+<!--       <screen_position x=".45" y=".3" /> -->
+<!--     </object> -->
     <object name="helicopter1">
-      <position x="10" y="40" />
-      <screen_position x=".7" y=".1" />
-    </object>
-    <object name="helicopter1">
-      <position x="15" y="60" />
-      <screen_position x=".7" y=".3" />
-    </object>
-    <object name="helicopter1">
-      <position x="40" y="160" />
-      <screen_position x=".45" y=".3" />
+      <position x="140" y="160" />
+      <screen_position x=".4" y=".2" />
     </object>
     <object name="helicopter1">
       <position x="13" y="52" />
@@ -38,10 +44,17 @@
 
   <actions>
     <stopScrolling>
-      <position x="50" />
+      <position x="3000" />
     </stopScrolling>
   </actions>
 
+  <scenery>
+    <part name="hill">
+      <position x="110" y="52" />
+      <screen_position x=".3" y=".01" />
+    </part>
+  </scenery>
+  
   <ground>
     <!-- części podłoża nie muszą być jednakowej szerokości,
 	 wysokość powinna być w przybliżeniu jednakowa -->
@@ -63,7 +76,7 @@
   </ground>
 
   <background>
-    <part name="bgHill" repeat="3" />
+    <part name="bgHill" filename="bgs/bg1.png" repeat="3" />
   </background>
 
 </level>

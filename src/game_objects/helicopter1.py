@@ -4,7 +4,7 @@
 import sys
 sys.path.append("../")
 
-from aiStrategy import AIStrategy, DumbAIStrategy
+from aiStrategy import AIStrategy, DumbAIStrategy, MoveAIStrategy
 from gameObject import GameObjectEnemy, GameObjectCreator
 
 
@@ -30,4 +30,5 @@ class Helicopter1Creator(GameObjectCreator):
         self.object = Helicopter1()
 
     def create_ai_strategy(self):
-        self.aiStrategy = DumbAIStrategy(self.object, self.spriteStrategy)
+#         self.aiStrategy = DumbAIStrategy(self.object, self.spriteStrategy)
+        self.aiStrategy = MoveAIStrategy(self.object, self.spriteStrategy)
