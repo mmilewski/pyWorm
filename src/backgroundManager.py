@@ -13,14 +13,14 @@ class BackgroundManager(object):
         self.__backgroundTexture = None                 # tekstura tła
         self.__backgroundOffset = 0                     # zamiast obiektów przesuwamy tło
         self.__window_coords = None                     # wymiar okna (np. 800x600)
-        self.__window_dim = None                        # przeskalowany wymiar okna (np. 1,0.75)
+        self.__window_draw_dim = None                   # przeskalowany wymiar okna (np. 1,0.75)
         self.__levelManager = levelManager
 
     def set_window_coords(self, coords):
         self.__window_coords = coords
 
-    def set_window_dim(self, dim):
-        self.__window_dim = dim
+    def set_window_draw_dim(self, dim):
+        self.__window_draw_dim = dim
 
 
     def update( self, dt ):

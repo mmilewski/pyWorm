@@ -4,12 +4,12 @@
 from gameObject import GameObject,GameObjectCreator
 
 
-class SceneryObjectCreator(GameObjectCreator):
+class GroundObjectCreator(GameObjectCreator):
     def __init__(self, spriteManager):
         GameObjectCreator.__init__(self,spriteManager)
 
 
-class SceneryObject(GameObject):
+class GroundObject(GameObject):
     def __init__(self):
         GameObject.__init__(self)
 

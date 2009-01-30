@@ -7,16 +7,9 @@
   </header>
 
   <definitions>
-    <definition name="grass">
-      <sprite filename="grass.sprite" animation="" /> </definition>
-    <definition name="stone">
-      <sprite filename="stone.sprite" animation="" /> </definition>
-    <definition name="bridge">
-      <sprite filename="bridge.sprite" animation="" /> </definition>
-    <definition name="hole">
-      <sprite filename="hole.sprite" animation="big" /> </definition>
-    <definition name="sHill">
-      <sprite filename="sHill.sprite" animation="" /> </definition>
+    <definition name="grass">   <sprite animation="default" /> </definition>
+    <definition name="stone">   <sprite animation="default" /> </definition>
+    <definition name="bridge">  <sprite animation="default" /> </definition>
   </definitions>
 
   <objects>
@@ -51,28 +44,16 @@
   <scenery>
     <part name="hill">
       <position x="110" y="52" />
-      <screen_position x=".3" y=".01" />
+      <screen_position x=".01" y=".01" />
     </part>
   </scenery>
   
   <ground>
-    <!-- części podłoża nie muszą być jednakowej szerokości,
-	 wysokość powinna być w przybliżeniu jednakowa -->
-    <!-- przejścia wykrywane są automatycznie na podstawie
-	 joinWithNext, chyba że przejście zostanie wymuszone przez useJoin,
-	 wtedy joinsWithNext nie ma znaczenia; wczesna implementacja
-	 może nie obsługiwać useJoin! -->
-    <!-- być może koniecze będzie wprowadzenie dodatkowego argumentu
-	 mówiącego o porządku elementów <part>, np. id albo l.p. -->
-    <part name="stone" repeat="1" joinWithNext="true" /> <!-- szuka
-    przejścia w sprajcie stone w animacji grass -->
-    <part name="grass" repeat="2" joinWithNext="true" /> <!-- szuka
-    przejścia w spajcie grass w animacji brigde -->
-    <part name="brigde" repeat="1" joinWithNext="false" />
-    <part name="hole" repeat="1" joinWithNext="false" />
-    <part name="stone" repeat="3" joinWithNext="true" />
-    <part name="bridge" repeat="2" joinWithNext="bezZnaczenia" />
-      <!--       useJoin="extraSprite,stonebrigdeTransition" /> -->
+    <part name="stone" repeat="1"  />
+    <part name="bridge" repeat="3"  />
+    <part name="grass" repeat="1"  />
+    <part name="bridge" repeat="5"  />
+    <part name="grass" repeat="1"  />
   </ground>
 
   <background>

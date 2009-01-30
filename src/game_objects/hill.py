@@ -4,7 +4,7 @@
 import sys
 sys.path.append("../")
 
-from aiStrategy import AIStrategy, DumbAIStrategy
+from aiStrategy import DumbAIStrategy
 from sceneryObject import SceneryObject, SceneryObjectCreator
 
 
@@ -25,7 +25,6 @@ class Hill(SceneryObject):
 class HillCreator(SceneryObjectCreator):
     def __init__(self, spriteManager):
         SceneryObjectCreator.__init__(self, spriteManager)
-        pass
 
     def create_object(self):
         self.object = Hill()

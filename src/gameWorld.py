@@ -28,6 +28,9 @@ from pyglet import image
 from render_toolkit import draw_textured_quad, compute_tex_vertex_coords
 import const
 
+from groundObject import GroundObject
+from sceneryObject import SceneryObject
+
 
 class GameWorld(object):
 
@@ -40,10 +43,12 @@ class GameWorld(object):
         self.__spriteManager     = SpriteManager()                           # menadżer sprite'ów
         self.__collisionManager  = CollisionManager(self.__spriteManager)    # menadżer kolizji
         self.__objectFactory     = self.__create_object_factory(self.__spriteManager) # fabryka obiektów
-        self.__levelManager      = LevelManager(self.__objectFactory)        # menadżer poziomów
+        self.__levelManager      = LevelManager(self.__objectFactory,self.__spriteManager)  # menadżer poziomów
         self.__backgroundManager = BackgroundManager( levelManager = self.__levelManager )
         self.__backgroundManager.set_window_coords( self.__theApp.get_window_coords() )
-        self.__backgroundManager.set_window_dim( self.__theApp.get_window_dim() )
+        self.__backgroundManager.set_window_draw_dim( self.__theApp.get_window_draw_dim() )
+        self.__levelManager.set_window_coords( self.__theApp.get_window_coords() )
+        self.__levelManager.set_window_draw_dim( self.__theApp.get_window_draw_dim() )
 
         if not self.__levelManager.load_level("demo_level"):
             assert True, "Tworzenie świata nie powiodło się. Nie można wczytać poziomu."
@@ -79,7 +84,7 @@ class GameWorld(object):
 
 
     def get_background_manager(self):
-        assert self.__backgroundManager, "Obiekt tła nie istnieje."
+        assert self.__backgroundManager, "Obiekt menedżera tła nie istnieje."
         return self.__backgroundManager
 
 
@@ -102,7 +107,7 @@ class GameWorld(object):
         for obj in self.__objects:
             obj.update( dt )
 
-        # aktualizuj tło, pejzaż, podłoże,...
+        # aktualizuj tło
         self.get_background_manager().update( dt )
 
 
@@ -119,7 +124,7 @@ class GameWorld(object):
         animName    = obj.get_current_animation_name()
         frameNum    = obj.get_current_frame_num()
         frame     = self.__spriteManager.get_frame( spriteName, animName, frameNum )
-        (ww,wh)   = self.__theApp.get_window_dim()
+        (ww,wh)   = self.__theApp.get_window_draw_dim()
         (tc,vs)   = compute_tex_vertex_coords( obj, frame, ww, wh )
         textureId = frame.textureId
 
@@ -141,7 +146,6 @@ class GameWorld(object):
 
     def draw(self):
         ''' Rysuje wszystkie obiekty w świecie. '''
-
         glClearColor( 0.4, 0.4, 0.4, 0.5 )
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
         glMatrixMode( GL_MODELVIEW )
@@ -150,12 +154,25 @@ class GameWorld(object):
         # zmień viewport, będziemy renderować do tekstury
         tw,th = const.renderTextureSize
         glViewport( 0, 0, tw, th )
+        glTranslatef( 0, 0, -10 )
 
         # narysuj tło
         self.get_background_manager().draw_background()
 
-        # narysuj wszystkie obiekty
+        # narysuj scenerię
+        glTranslatef( 0, 0, 1 )
+        for obj in filter(lambda o:isinstance(o,SceneryObject),self.__objects):
+            self.__draw_object( obj )
+
+        # narysuj jednostki, etc.
+        glTranslatef( 0, 0, 1 )
         for obj in self.__objects:
+            if not (isinstance(obj,SceneryObject) and isinstance(obj,GroundObject)):
+                self.__draw_object( obj )
+
+        # narysuj podłoże
+        glTranslatef( 0, 0, 1 )
+        for obj in filter(lambda o:isinstance(o,GroundObject) and o.position[0]<1.1,self.__objects):
             self.__draw_object( obj )
 
         # zapisz bufor do tekstury
@@ -171,7 +188,7 @@ class GameWorld(object):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
         glEnable( GL_TEXTURE_2D )
-        glColor3f( .5, 1, 1 )
+        glColor3f( 1, 1, 1 )
 
         # renderuj czworokąt na cały ekran
         coords = self.__theApp.get_window_coords()

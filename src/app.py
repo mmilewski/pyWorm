@@ -13,7 +13,7 @@ from inputManager import InputManager
 class App(object):
 
     def __init__(self):
-        fullscreen = False
+        fullscreen = True
         vsync = True
         
         if fullscreen:
@@ -47,7 +47,11 @@ class App(object):
     def get_window_dim(self):
         ''' Zwraca wymiary okna (szerokość, wysokość) '''
         return (float(self.__window.width), float(self.__window.height))
-        
+
+    def get_window_draw_dim(self):
+        ''' Zwraca współrzędne, w których należy rysować (szerokość, wysokość). '''
+        return (1000.0, 750.0)
+
     def main_loop(self):
         ''' Pętla główna gry. '''
         while not self.__window.has_exit:

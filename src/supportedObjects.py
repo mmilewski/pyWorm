@@ -8,12 +8,11 @@
 # nowego prototypu do gry
 #
 
-import sys
-# sys.path.append("../")
-
 from helicopter1 import Helicopter1Creator
 from hill import HillCreator
-
+from stone import StoneCreator
+from grass import GrassCreator
+from bridge import BridgeCreator
 
 def add_supported_objects_to_factory(objFactory, spriteManager):
 
@@ -27,3 +26,9 @@ def add_supported_objects_to_factory(objFactory, spriteManager):
 
     # sceneria
     add_object( objFactory, 'hill', HillCreator(spriteManager))
+
+    # podłoże
+    add_object( objFactory, 'stone', StoneCreator(spriteManager))
+    add_object( objFactory, 'grass', GrassCreator(spriteManager))
+    add_object( objFactory, 'bridge', BridgeCreator(spriteManager))
+#     add_object( objFactory, 'hill', HillCreator(spriteManager))

@@ -1,0 +1,12 @@
+-- -*- mode:haskell; coding: utf-8 -*-
+
+
+ANIMATION = "default"
+      Y_OFFSET = 0
+      X_OFFSET = 0
+      FRAME_WIDTH = 512
+      FRAME_HEIGHT = 32
+      FRAMES_COUNT = 1
+      COLS_COUNT = 1
+      DURATION = 100
+
