@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pyglet.gl import *
+from pyglet import font
 
 import sys
 sys.path.append("game_objects/") # konieczne do korzystania z game_objectów
@@ -175,31 +176,35 @@ class GameWorld(object):
         for obj in filter(lambda o:isinstance(o,GroundObject) and o.position[0]<1.1,self.__objects):
             self.__draw_object( obj )
 
-        # zapisz bufor do tekstury
-        assert glIsTexture( self.__renderTexture.id ), "Próba narysowania czegoś, co nie jest teksturą, %s" % type(self.__renderTexture.id)
-        glBindTexture( GL_TEXTURE_2D, self.__renderTexture.id )
-        glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, tw, th, 0 )
-#         glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, tw, th )
+#         # zapisz bufor do tekstury
+#         assert glIsTexture( self.__renderTexture.id ), "Próba narysowania czegoś, co nie jest teksturą, %s" % type(self.__renderTexture.id)
+#         glBindTexture( GL_TEXTURE_2D, self.__renderTexture.id )
+#         glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, tw, th, 0 )
+# #         glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, tw, th )
 
-        # przywróć viewport, wyczyść bufor i narysuj czworokąt z zapisaną teksturą
-        winSize = map( lambda x:int(x), self.__theApp.get_window_dim() )
-        glViewport( 0, 0, winSize[0], winSize[1] )
-        glClearColor( 0.5, 0.5, 0.5, 0.5 )
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glLoadIdentity()
-        glEnable( GL_TEXTURE_2D )
-        glColor3f( 1, 1, 1 )
+#         # przywróć viewport, wyczyść bufor i narysuj czworokąt z zapisaną teksturą
+#         winSize = map( lambda x:int(x), self.__theApp.get_window_dim() )
+#         glViewport( 0, 0, winSize[0], winSize[1] )
+#         glClearColor( 0.5, 0.5, 0.5, 0.5 )
+#         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+#         glLoadIdentity()
+#         glEnable( GL_TEXTURE_2D )
+#         glColor3f( 1, 1, 1 )
 
-        # renderuj czworokąt na cały ekran
-        coords = self.__theApp.get_window_coords()
-        x0,x1,y0,y1 = coords[0], coords[1], coords[2], coords[3]
-        tc = [ (  0,  0), (  1,  0), (  1,  1), (  0,  1) ]
-        vs = [ ( x0, y0), ( x1, y0), ( x1, y1), ( x0, y1) ]
-        draw_textured_quad( tc, vs, self.__renderTexture.id )
+#         # renderuj czworokąt na cały ekran
+#         coords = self.__theApp.get_window_coords()
+#         x0,x1,y0,y1 = coords[0], coords[1], coords[2], coords[3]
+#         tc = [ (  0,  0), (  1,  0), (  1,  1), (  0,  1) ]
+#         vs = [ ( x0, y0), ( x1, y0), ( x1, y1), ( x0, y1) ]
+#         draw_textured_quad( tc, vs, self.__renderTexture.id )
 
         # zrzuć wszystko
         glFlush()
-
+        
+        arial = font.load('Arial', 14, bold=True, italic=False)
+        text = font.Text(arial,"Witaj")
+        text.draw()
+        
 
     def check_collisions(self):
         ''' Pobiera pary kolidujących obiektów i nakazuje obsługę któremuś z nich. '''
