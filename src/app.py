@@ -9,17 +9,18 @@ from gameWorld import GameWorld
 from camera import Camera
 from inputManager import InputManager
 
+import config
 
 class App(object):
 
     def __init__(self):
-        fullscreen = True
-        vsync = True
+        vsync = config.IS_VSYNC
         
-        if fullscreen:
+        if config.IS_FULLSCREEN:
             self.__window = window.Window( fullscreen=True, vsync=vsync )
         else:
-            self.__window = window.Window( width=800, height=600, fullscreen=False, vsync=vsync )
+            width,height = config.WIN_SIZE
+            self.__window = window.Window( width=width, height=height, fullscreen=False, vsync=vsync )
 
         self.__winSize = winSize = ( self.__window.width, self.__window.height )
 
@@ -30,7 +31,8 @@ class App(object):
         self.__window.on_key_press   = self.__inputManager.key_pressed
         self.__window.on_key_release = self.__inputManager.key_released
 
-        # clock.set_fps_limit(50) # FIXME: ??? usunąć to ???
+        if config.IS_FPS_LIMIT:
+            clock.set_fps_limit( FPS_LIMIT )
         
         glDepthFunc( GL_LEQUAL )
         glEnable( GL_DEPTH_TEST )
@@ -59,8 +61,8 @@ class App(object):
 
             # update świata i HUDa
             dt = clock.tick()
-#             if dt>0.001:
-#                 print "FPS:", 1.0/dt
+            if dt>0.001:
+                print "FPS:", 1.0/dt
             self.__world.update( dt )
 #             self.__hud.update( dt )
 

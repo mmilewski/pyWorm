@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import config
+
 class AIStrategy(object):
 
     def __init__(self, gameObject, spriteStrategy):
@@ -28,7 +30,7 @@ class DumbAIStrategy(AIStrategy):
     
     def __init__(self, gameObject, spriteStrategy):
         AIStrategy.__init__(self, gameObject, spriteStrategy)
-                            
+
     def update(self, dt):
         pass
 
@@ -40,18 +42,28 @@ class MoveAIStrategy(AIStrategy):
     def __init__(self, gameObject, spriteStrategy):
         AIStrategy.__init__(self, gameObject, spriteStrategy)
         self.__timer = 0         # licznik czasu, który upłynął
-                            
+
     def update(self, dt):
         self.__timer+=dt
         self.gameObject.velocity=(cos(self.__timer+1.5)/7,cos(self.__timer)/10.0)
 
-        
+
 class ScrollAIStrategy(AIStrategy):
-    ''' Przykładowa strategia powodująca ruch obiektu.'''
+    ''' Przykładowa strategia powodująca przewijanie się obiektu na scenie (np. dla górek).'''
     def __init__(self, gameObject, spriteStrategy):
         AIStrategy.__init__(self, gameObject, spriteStrategy)
         self.__timer = 0         # licznik czasu, który upłynął
-                            
+
     def update(self, dt):
         self.__timer+=dt
-        self.gameObject.velocity=(-0.11,0)
+        self.gameObject.velocity = config.SCROLL_VELOCITY_OBJECT
+
+
+class GroundMoveAIStrategy(AIStrategy):
+    ''' Strategia dla pojazdów poruszających się po ziemi.'''
+    def __init__(self,gameObject,spriteStrategy,xvelocity):
+        AIStrategy.__init__(self,gameObject, spriteStrategy)
+        self.gameObject.velocity = (xvelocity, GROUND_LINE)
+
+    def update(self,dt):
+        pass

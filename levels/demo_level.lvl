@@ -13,26 +13,23 @@
   </definitions>
 
   <objects>
-<!--     <object name="helicopter1"> -->
-<!--       <position x="210" y="40" /> -->
-<!--       <screen_position x=".7" y=".1" /> -->
-<!--     </object> -->
-<!--     <object name="helicopter1"> -->
-<!--       <position x="130" y="60" /> -->
-<!--       <screen_position x=".7" y=".3" /> -->
-<!--     </object> -->
-<!--     <object name="helicopter1"> -->
-<!--       <position x="160" y="160" /> -->
-<!--       <screen_position x=".45" y=".3" /> -->
-<!--     </object> -->
-    <object name="helicopter1">
-      <position x="140" y="160" />
-      <screen_position x=".4" y=".2" />
-    </object>
-    <object name="helicopter1">
-      <position x="13" y="52" />
-      <screen_position x=".7" y=".5" />
-    </object>
+    <object name="helicopter1">      <position x="140" y="160" />      <screen_position x=".4" y=".2" />    </object>
+    <object name="helicopter1">      <position x="13"  y="52" />       <screen_position x=".7" y=".5" />    </object>
+
+    <object name="tank1">      <position x="150" y="10" />      <screen_position x="1.2" y=".025" />    </object>
+    <object name="tank1">      <position x="161" y="10" />      <screen_position x="1.2" y=".025" />    </object>
+    <object name="tank1">      <position x="174" y="10" />      <screen_position x="1.2" y=".025" />    </object>
+    <object name="tank1">      <position x="190" y="10" />      <screen_position x="1.2" y=".025" />    </object>
+
+    <object name="tank1">      <position x="250" y="10" />      <screen_position x="1.2" y=".025" />    </object>
+    <object name="tank1">      <position x="265" y="10" />      <screen_position x="1.2" y=".025" />    </object>
+    <object name="tank1">      <position x="280" y="10" />      <screen_position x="1.2" y=".025" />    </object>
+    <object name="tank1">      <position x="295" y="10" />      <screen_position x="1.2" y=".025" />    </object>
+
+    <object name="tank1">      <position x="400" y="10" />      <screen_position x="1.2" y=".025" />    </object>
+
+    <object name="tank1">      <position x="500" y="10" />      <screen_position x="1.2" y=".025" />    </object>
+    <object name="tank1">      <position x="520" y="10" />      <screen_position x="1.2" y=".025" />    </object>
   </objects>
 
   <actions>
@@ -42,18 +39,29 @@
   </actions>
 
   <scenery>
-    <part name="hill">
-      <position x="110" y="52" />
-      <screen_position x=".01" y=".01" />
-    </part>
+    <part name="hill">      <position x="110" y="10" />      <screen_position x="1.21" y=".01" />    </part>
+    <part name="hill">      <position x="10"  y="10" />      <screen_position x="0.21" y=".01" />    </part>
+    <part name="hill">      <position x="510" y="10" />      <screen_position x="1.21" y=".01" />    </part>
+    <part name="hill">      <position x="610" y="10" />      <screen_position x="1.21" y=".01" />    </part>
   </scenery>
   
   <ground>
-    <part name="stone" repeat="1"  />
+    <part name="stone"  repeat="1"  />
     <part name="bridge" repeat="3"  />
-    <part name="grass" repeat="1"  />
+    <part name="grass"  repeat="1"  />
     <part name="bridge" repeat="5"  />
-    <part name="grass" repeat="1"  />
+    <part name="grass"  repeat="3"  />
+    <part name="stone"  repeat="4"  />
+    <part name="bridge" repeat="2"  />
+    <part name="stone"  repeat="1"  />
+    <part name="grass"  repeat="2"  />
+    <part name="grass"  repeat="1"  />
+    <part name="bridge" repeat="5"  />
+    <part name="grass"  repeat="3"  />
+    <part name="stone"  repeat="4"  />
+    <part name="bridge" repeat="2"  />
+    <part name="stone"  repeat="1"  />
+    <part name="grass"  repeat="2"  />
   </ground>
 
   <background>

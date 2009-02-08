@@ -4,7 +4,7 @@
 import sys
 sys.path.append("../")
 
-from aiStrategy import DumbAIStrategy
+from aiStrategy import DumbAIStrategy, ScrollAIStrategy
 from sceneryObject import SceneryObject, SceneryObjectCreator
 
 
@@ -30,4 +30,5 @@ class HillCreator(SceneryObjectCreator):
         self.object = Hill()
 
     def create_ai_strategy(self):
-        self.aiStrategy = DumbAIStrategy(self.object, self.spriteStrategy)
+#         self.aiStrategy = DumbAIStrategy(self.object, self.spriteStrategy)
+        self.aiStrategy = ScrollAIStrategy(self.object,self.spriteStrategy)

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from pyglet.gl import *
-from pyglet import font
 
 import sys
 sys.path.append("game_objects/") # konieczne do korzystania z game_objectów
@@ -28,6 +27,7 @@ from pyglet import image
 # pomocnicze
 from render_toolkit import draw_textured_quad, compute_tex_vertex_coords
 import const
+import config
 
 from groundObject import GroundObject
 from sceneryObject import SceneryObject
@@ -54,7 +54,7 @@ class GameWorld(object):
         if not self.__levelManager.load_level("demo_level"):
             assert True, "Tworzenie świata nie powiodło się. Nie można wczytać poziomu."
 
-        const.renderTextureSize = (512,512)                # rozmiary tekstury, do której będziemy renderować
+        const.renderTextureSize = (512,256)                # rozmiary tekstury, do której będziemy renderować
         self.__renderTexture = image.create( *const.renderTextureSize ).get_texture()
 
         # Dodaj obiekt helikoptera i jeepa do gry
@@ -94,6 +94,16 @@ class GameWorld(object):
 
         # aktualizacja menedżera poziomu (np. stworzenie nowych jednostek)
         self.__levelManager.update( dt, self )
+
+        # usuń obiekty, które są za lewą krawędzią planszy
+        for obj in self.__objects:
+            animName    = obj.get_current_animation_name()
+            frame       = self.__spriteManager.get_frame( obj.spriteName, animName, 0 )
+            (ww,wh)     = self.__theApp.get_window_draw_dim()
+            objectWidth = frame.width / float(ww)
+            if obj.position[0]+objectWidth < -0.5:
+                print "DELETED:",obj.spriteName
+                obj.destroy()
 
         # odfiltruj obiekty, które są zniszczone
         for o in self.__objects:
@@ -153,8 +163,10 @@ class GameWorld(object):
         glLoadIdentity()
 
         # zmień viewport, będziemy renderować do tekstury
-        tw,th = const.renderTextureSize
-        glViewport( 0, 0, tw, th )
+        if config.IS_RENDER_TO_TEXTURE:
+            tw,th = const.renderTextureSize
+            glViewport( 0, 0, tw, th )
+
         glTranslatef( 0, 0, -10 )
 
         # narysuj tło
@@ -168,7 +180,7 @@ class GameWorld(object):
         # narysuj jednostki, etc.
         glTranslatef( 0, 0, 1 )
         for obj in self.__objects:
-            if not (isinstance(obj,SceneryObject) and isinstance(obj,GroundObject)):
+            if not (isinstance(obj,SceneryObject) or isinstance(obj,GroundObject)):
                 self.__draw_object( obj )
 
         # narysuj podłoże
@@ -176,34 +188,32 @@ class GameWorld(object):
         for obj in filter(lambda o:isinstance(o,GroundObject) and o.position[0]<1.1,self.__objects):
             self.__draw_object( obj )
 
-#         # zapisz bufor do tekstury
-#         assert glIsTexture( self.__renderTexture.id ), "Próba narysowania czegoś, co nie jest teksturą, %s" % type(self.__renderTexture.id)
-#         glBindTexture( GL_TEXTURE_2D, self.__renderTexture.id )
-#         glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, tw, th, 0 )
-# #         glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, tw, th )
+        # zapisz bufor do tekstury
+        if config.IS_RENDER_TO_TEXTURE:
+            assert glIsTexture( self.__renderTexture.id ), "Próba narysowania czegoś, co nie jest teksturą"
+            glBindTexture( GL_TEXTURE_2D, self.__renderTexture.id )
+            glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, tw, th, 0 )
+#             glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, tw, th )
 
-#         # przywróć viewport, wyczyść bufor i narysuj czworokąt z zapisaną teksturą
-#         winSize = map( lambda x:int(x), self.__theApp.get_window_dim() )
-#         glViewport( 0, 0, winSize[0], winSize[1] )
-#         glClearColor( 0.5, 0.5, 0.5, 0.5 )
-#         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-#         glLoadIdentity()
-#         glEnable( GL_TEXTURE_2D )
-#         glColor3f( 1, 1, 1 )
+        # przywróć viewport, wyczyść bufor i narysuj czworokąt z zapisaną teksturą
+        winSize = map( lambda x:int(x), self.__theApp.get_window_dim() )
+        glViewport( 0, 0, winSize[0], winSize[1] )
+        if config.IS_RENDER_TO_TEXTURE:
+            glClearColor( 0.5, 0.5, 0.5, 0.5 )
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glLoadIdentity()
+            glEnable( GL_TEXTURE_2D )
+            glColor3f( 1, 1, 1 )
 
-#         # renderuj czworokąt na cały ekran
-#         coords = self.__theApp.get_window_coords()
-#         x0,x1,y0,y1 = coords[0], coords[1], coords[2], coords[3]
-#         tc = [ (  0,  0), (  1,  0), (  1,  1), (  0,  1) ]
-#         vs = [ ( x0, y0), ( x1, y0), ( x1, y1), ( x0, y1) ]
-#         draw_textured_quad( tc, vs, self.__renderTexture.id )
+            # renderuj czworokąt na cały ekran
+            coords = self.__theApp.get_window_coords()
+            x0,x1,y0,y1 = coords[0], coords[1], coords[2], coords[3]
+            tc = [ (  0,  0), (  1,  0), (  1,  1), (  0,  1) ]
+            vs = [ ( x0, y0), ( x1, y0), ( x1, y1), ( x0, y1) ]
+            draw_textured_quad( tc, vs, self.__renderTexture.id )
 
         # zrzuć wszystko
         glFlush()
-        
-        arial = font.load('Arial', 14, bold=True, italic=False)
-        text = font.Text(arial,"Witaj")
-        text.draw()
         
 
     def check_collisions(self):
