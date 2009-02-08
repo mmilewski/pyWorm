@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+''' Moduł odpowiada za akcje związane z tłem. Rysowanie/aktualizacja.'''
+
 from pyglet.gl import *
 import os.path
 from pyglet import image

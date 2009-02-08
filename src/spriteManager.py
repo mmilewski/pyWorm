@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+''' Moduł zawiera klasę zarządzającą sprite'ami oraz klasę opisującą jedną klatkę animacji.'''
+
 from pyglet import image
 
 from spriteScriptParser import SpriteAnimationInfo

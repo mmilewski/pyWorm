@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+''' Moduł zawiera klasę bazową dla wszystkich strategii oraz kilka przykładowych implementacji. '''
+
 import config
 
 class AIStrategy(object):
@@ -63,7 +65,7 @@ class GroundMoveAIStrategy(AIStrategy):
     ''' Strategia dla pojazdów poruszających się po ziemi.'''
     def __init__(self,gameObject,spriteStrategy,xvelocity):
         AIStrategy.__init__(self,gameObject, spriteStrategy)
-        self.gameObject.velocity = (xvelocity, GROUND_LINE)
+        self.gameObject.velocity = (xvelocity, 0)
 
     def update(self,dt):
         pass

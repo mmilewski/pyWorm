@@ -26,3 +26,6 @@ SCROLL_VELOCITY_OBJECT = (-0.11,0)
 
 # poziom, po którym poruszają się pojazdy naziemne
 GROUND_LINE = 0.25
+
+# czas wyświetlania ekranu splash
+SPLASH_DISPLAY_TIME = 3

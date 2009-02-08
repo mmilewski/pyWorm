@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+''' Moduł zawiera reprezentację obiektu podłoża.'''
+
 from gameObject import GameObject,GameObjectCreator
 
 

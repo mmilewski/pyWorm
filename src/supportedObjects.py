@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#
-# W tym pliku jest definicja tylko jednej funkcji. Jest to funkcja
-# tworząca prototypy wszystkich możliwych obiektów w grze. Należy ją
-# modyfikować (dodawać nowe wiersze) zawsze gdy jest potrzeba dodania
-# nowego prototypu do gry
-#
+
+''' W tym pliku jest definicja tylko jednej funkcji. Jest to funkcja
+tworząca prototypy wszystkich możliwych obiektów w grze. Należy ją
+modyfikować (dodawać nowe wiersze) zawsze gdy jest potrzeba dodania
+nowego prototypu do gry.'''
+
 
 from helicopter1 import Helicopter1Creator
 from hill import HillCreator
@@ -33,4 +33,3 @@ def add_supported_objects_to_factory(objFactory, spriteManager):
     add_object( objFactory, 'stone', StoneCreator(spriteManager))
     add_object( objFactory, 'grass', GrassCreator(spriteManager))
     add_object( objFactory, 'bridge', BridgeCreator(spriteManager))
-#     add_object( objFactory, 'hill', HillCreator(spriteManager))

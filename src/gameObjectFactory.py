@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+''' Moduł zawiera fabrykę obiektów. Znane obiekty są w module supportedObjects. '''
 
 class GameObjectFactory(object):
 

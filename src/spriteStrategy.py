@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+''' Moduł zawiera klasą aktualizującą animację obiektu (sprite'a).'''
 
 from math import floor
 

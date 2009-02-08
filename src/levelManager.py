@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+''' Moduł zawiera klasę do obsługu poziomu. Komunikując się z LevelParserem
+dodaje do poziomu obiekty w odpowiednim momencie.'''
+
 import os.path              # join, isfile
 import levelParser
 

@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from pyglet import clock, font, image, window
+''' Moduł odpowiedzialny za rozruch programu.'''
+
+from pyglet import clock, image, window
 from pyglet.gl import *
 
 from hud import HUD
@@ -10,6 +12,7 @@ from camera import Camera
 from inputManager import InputManager
 
 import config
+from splash import Splash        # splash screen
 
 class App(object):
 
@@ -56,23 +59,37 @@ class App(object):
 
     def main_loop(self):
         ''' Pętla główna gry. '''
+
+        self.__timeElapsed = 0.0     # czas jaki upłynął od początku gry
+        splash = Splash(self, self.__camera, config.SPLASH_DISPLAY_TIME)
+
         while not self.__window.has_exit:
             self.__window.dispatch_events()
 
             # update świata i HUDa
             dt = clock.tick()
+            self.__timeElapsed += dt
             if dt>0.001:
                 print "FPS:", 1.0/dt
-            self.__world.update( dt )
-#             self.__hud.update( dt )
 
-            # narysuj świat
+            # ustaw kamerę
             self.__camera.set3d()
-            self.__world.draw()
 
-            # narysuj HUD
-#             self.__camera.set2d()
-#             self.__hud.draw()
+            # narysuj splash screen albo grę
+            if self.__timeElapsed < config.SPLASH_DISPLAY_TIME:
+                splash.update(dt)
+                splash.draw()
+            else:
+                self.__world.update( dt )
+#                 self.__hud.update( dt )
+
+                # narysuj świat
+                self.__camera.set3d()
+                self.__world.draw()
+
+#                 # narysuj HUD
+#                 self.__camera.set2d()
+#                 self.__hud.draw()
 
             self.__window.flip()
             

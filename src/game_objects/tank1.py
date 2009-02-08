@@ -29,4 +29,4 @@ class Tank1Creator(GameObjectCreator):
         self.object = Tank1()
 
     def create_ai_strategy(self):
-        self.aiStrategy = GroundMoveAIStrategy( self.object, self.spriteStrategy, -0.14 )
+        self.aiStrategy = GroundMoveAIStrategy( self.object, self.spriteStrategy, -0.15 )
