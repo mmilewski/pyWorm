@@ -8,23 +8,27 @@ from pyglet.gl import *
 import sys
 sys.path.append("game_objects/") # konieczne do korzystania z game_objectów
 
+
 # zarządcy
 from collisionManager import CollisionManager
 from levelManager import LevelManager
 from spriteManager import SpriteManager
 from backgroundManager import BackgroundManager
 
+
 # obiekty gry
 from supportedObjects import add_supported_objects_to_factory
 from gameObjectFactory import GameObjectFactory
 from gameObject import GameObject
 from playerGameObject import PlayerGameObject
+
 from playerHeli import PlayerHeliAIStrategy, PlayerHeliCreator
 
 # sprite'y
 from spriteStrategy import SpriteScriptStrategy
 from spriteScriptParser import SpriteScriptParser
 from pyglet import image
+
 
 # pomocnicze
 from render_toolkit import draw_textured_quad, compute_tex_vertex_coords

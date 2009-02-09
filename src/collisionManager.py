@@ -1,7 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from gameObject import GameObject
+import sys
+sys.path.append("game_objects/") # konieczne do korzystania z game_objectów
+
+from gameObject import GameObject, GameObjectEnemy
+from playerGameObject import PlayerGameObject
+from groundObject import GroundObject
+from sceneryObject import SceneryObject
+from rocketGameObject import RocketGameObject
+
+
 
 class CollisionManager:
     def __init__(self, spriteManager, gameObjects = []):
@@ -30,11 +39,32 @@ class CollisionManager:
         for o1 in self.__objects:
             for o2 in self.__objects:
                 if o1 != o2:
-                    if self.__check_aabb_collision(o1,o2):
-                        if self.__check_per_pixel_collision(o1,o2):
-                            pairs.append( (o1,o2) )
+                    if self.__check_type_collision(o1, o2):
+                        if self.__check_aabb_collision(o1,o2):
+                            if self.__check_per_pixel_collision(o1,o2):
+                                pairs.append( (o1,o2) )
         return pairs
 
+
+    def __check_type_collision( self, o1, o2 ):
+        ''' Sprawdza kolizje po typie obiektów. Niektóre typy nie
+        kolidują ze sobą w ogóle (np. przeciwnicy między sobą) '''
+
+        
+        # Kolizje między graczem a przeciwnikiem
+        if isinstance( o1, PlayerGameObject ) and isinstance( o2, GameObjectEnemy ):
+            return True
+
+        if isinstance( o1, GameObjectEnemy ) and isinstance( o2, PlayerGameObject ):
+            return True
+
+        # Rakiety kolidują ze wszystkim
+        if isinstance( o1, RocketGameObject ) or isinstance( o2, RocketGameObject ):
+            return True
+        
+        return False
+
+    
     
     def __check_aabb_collision( self, o1, o2 ):
         ''' Sprawdza czy aabb, obiektów przekazanaych w argumentach, przecinają się. '''
