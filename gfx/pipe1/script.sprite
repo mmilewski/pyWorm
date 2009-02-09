@@ -1,11 +1,8 @@
 -- -*- mode:haskell; coding: utf-8 -*-
 
-FILE = "image.png"
-
-ANIMATION = ""
---       Y_OFFSET = 0
---       X_OFFSET = 0
-      FRAME = 256, 64
+ANIMATION = "default"
+      FRAME_WIDTH  = 256
+      FRAME_HEIGHT = 64
       FRAMES_COUNT = 1
-      COLS_COUNT = 1
-      DURATION = 1000
+      COLS_COUNT   = 1
+      DURATION     = 1000

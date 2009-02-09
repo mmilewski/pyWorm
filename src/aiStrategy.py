@@ -37,7 +37,7 @@ class DumbAIStrategy(AIStrategy):
         pass
 
 
-from math import cos
+from math import cos,sin
 
 class MoveAIStrategy(AIStrategy):
     ''' Przykładowa strategia powodująca ruch obiektu.'''
@@ -48,6 +48,20 @@ class MoveAIStrategy(AIStrategy):
     def update(self, dt):
         self.__timer+=dt
         self.gameObject.velocity=(cos(self.__timer+1.5)/7,cos(self.__timer)/10.0)
+
+
+class FunctionMoveAIStrategy(AIStrategy):
+    ''' Przykładowa strategia powodująca ruch obiektu. Jako velocityFunction przyjmuje
+    jednoargumentową funkcję prędkości od czasu. velocityFunction musi zwracać
+    parę (xvelocity,yvelocity).'''
+    def __init__(self, gameObject, spriteStrategy, velocityFunction):
+        AIStrategy.__init__(self, gameObject, spriteStrategy)
+        self.__timer = 0         # licznik czasu, który upłynął
+        self.__vFunction = velocityFunction
+
+    def update(self, dt):
+        self.__timer += dt
+        self.gameObject.velocity = self.__vFunction(self.__timer)
 
 
 class ScrollAIStrategy(AIStrategy):

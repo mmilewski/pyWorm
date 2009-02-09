@@ -125,7 +125,7 @@ class LevelManager(object):
             obj = self.__objectFactory.create_object( ground.get_name() )
             if obj:
                 obj.position = ground.get_position()
-                print "POS:",obj.position
+#                 print "POS:",obj.position
                 gameWorld.add_object( obj )
         self.__grounds = self.__grounds[ delete_counter : ]
 

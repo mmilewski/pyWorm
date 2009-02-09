@@ -60,6 +60,9 @@ class CollisionManager:
 
         # Rakiety kolidują ze wszystkim
         if isinstance( o1, RocketGameObject ) or isinstance( o2, RocketGameObject ):
+            if isinstance( o1, SceneryObject ) or isinstance( o1, GroundObject) or \
+                    isinstance( o2, SceneryObject ) or isinstance( o2, GroundObject):
+                return False
             return True
         
         return False

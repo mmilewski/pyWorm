@@ -68,9 +68,10 @@ class App(object):
             self.__window.dispatch_events()
 
             # update świata i HUDa
-            dt = clock.tick()
+            dt = clock.tick() * config.DTIME_MULTIPLY
             self.__timeElapsed += dt
-            if dt>0.001:
+
+            if config.PRINT_FPS and dt>0.001:
                 print "FPS:", 1.0/dt
 
             # ustaw kamerę

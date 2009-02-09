@@ -9,11 +9,14 @@ nowego prototypu do gry.'''
 
 
 from helicopter1 import Helicopter1Creator
+from helicopter1a import Helicopter1aCreator
 from hill import HillCreator
 from stone import StoneCreator
 from grass import GrassCreator
 from bridge import BridgeCreator
 from tank1 import Tank1Creator
+from pipe1 import Pipe1Creator
+from cannon import CannonCreator
 
 def add_supported_objects_to_factory(objFactory, spriteManager):
 
@@ -24,7 +27,10 @@ def add_supported_objects_to_factory(objFactory, spriteManager):
 
     # Dodawanie obiektów
     add_object(objFactory, 'helicopter1', Helicopter1Creator(spriteManager))
+    add_object(objFactory, 'helicopter1a', Helicopter1aCreator(spriteManager))
     add_object(objFactory, 'tank1', Tank1Creator(spriteManager))
+    add_object(objFactory, 'pipe1', Pipe1Creator(spriteManager))
+    add_object(objFactory, 'cannon', CannonCreator(spriteManager))
 
     # sceneria
     add_object( objFactory, 'hill', HillCreator(spriteManager))

@@ -1,19 +1,16 @@
 -- -*- mode:haskell; coding: utf-8 -*-
 
-FILE = "spritemachina1.png"
-
-ANIMATION = ""
---       Y_OFFSET = 0
---       X_OFFSET = 0
-      FRAME = 80, 89
+ANIMATION = "default"
+      FRAME_WIDTH  = 80
+      FRAME_HEIGHT = 89
       FRAMES_COUNT = 1
-      COLS_COUNT = 1
-      DURATION = 1000
+      COLS_COUNT   = 1
+      DURATION     = 1000
 
 ANIMATION = "shot"
---       Y_OFFSET = 0
---       X_OFFSET = 0
-      FRAME = 80, 89
+      FRAME_WIDTH  = 80
+      FRAME_HEIGHT = 89
       FRAMES_COUNT = 5
       COLS_COUNT = 5
       DURATION = 300
+

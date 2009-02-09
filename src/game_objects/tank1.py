@@ -13,9 +13,9 @@ class Tank1(GameObjectEnemy):
         GameObjectEnemy.__init__(self)
 
     def clone(self):
-        heli = Tank1()
-        self.clone_base(heli)
-        return heli
+        tank = Tank1()
+        self.clone_base(tank)
+        return tank
 
     def hit(self, damage):
         if damage > 0:

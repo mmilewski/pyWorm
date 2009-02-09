@@ -4,7 +4,7 @@
 ''' Moduł zawiera różne opcje konfiguracyjne.'''
 
 # True - program zostanie uruchomiony na pełnym ekranie, False - w oknie.
-IS_FULLSCREEN = False
+IS_FULLSCREEN = True
 
 # rozmiar okna, jeżeli program jest uruchamiany w oknie. Inaczej jest bez znaczenia.
 WIN_SIZE = (800,600)
@@ -21,6 +21,9 @@ IS_FPS_LIMIT = False
 # patrz IS_FPS_LIMIT.
 FPS_LIMIT = 50
 
+# czy wypisywać FPSy (na konsolę)
+PRINT_FPS = False
+
 # prędkość przewijania się obiektów na scenie.
 SCROLL_VELOCITY_OBJECT = (-0.11,0)
 
@@ -29,4 +32,7 @@ SCROLL_VELOCITY_OBJECT = (-0.11,0)
 GROUND_LINE = 0.25
 
 # czas wyświetlania ekranu splash (w sekundach).
-SPLASH_DISPLAY_TIME = 3.57
+SPLASH_DISPLAY_TIME = 6
+
+# współrzynnik, przez który będzie mierzony upływ czasu. Jeśli >1, to gra przyspieszy
+DTIME_MULTIPLY = 1.0

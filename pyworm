@@ -3,4 +3,4 @@
 PYTHON=python
 
 cd src;
-$PYTHON app.py;
+$PYTHON -O app.py;
