@@ -56,6 +56,7 @@ class App(object):
     def get_window_draw_dim(self):
         ''' Zwraca współrzędne, w których należy rysować (szerokość, wysokość). '''
         return (1000.0, 750.0)
+        # return (800.0, 600.0)    
 
     def main_loop(self):
         ''' Pętla główna gry. '''

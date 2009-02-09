@@ -109,7 +109,7 @@ class GameObject(object):
 
     def display_pad(self):
         ''' Zwraca informację o tym, czy podkładka ma być wyświetlona,
-        tzn. czy pod sprite'm ma być wyświetlony jego aabb. Domyślnie tak.'''
+        tzn. czy pod sprite'm ma być wyświetlony jego aabb.'''
         return False
         
     def __set_vel(self, vel): self.__vel = vel
@@ -137,7 +137,7 @@ class GameObject(object):
     spriteStrategy = property(lambda self: self.__spriteStrategy,
                               set_sprite_strategy)
 
-    
+
     def get_current_animation_name(self):
         if self.__spriteStrategy:
             return self.__spriteStrategy.get_animation_name()

@@ -51,11 +51,10 @@ class CollisionManager:
         x2 += dx2
         y2 += dy2
 
-
-        x1 *= 800
-        x2 *= 800
-        y1 *= 600
-        y2 *= 600
+        x1 *= 1000 # 800
+        x2 *= 1000 # 800
+        y1 *= 750  # 600
+        y2 *= 750  # 600
 
         isCollision = True
         if y2 + h2 < y1: isCollision = False
@@ -72,4 +71,4 @@ class CollisionManager:
         assert isinstance( o1, GameObject ) and \
             isinstance( o2, GameObject), "Niepoprawny typ"
 
-        return True
+        return self.__spriteManager.check_per_pixel_collision(o1, o2)
